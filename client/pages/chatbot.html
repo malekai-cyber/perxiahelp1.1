@@ -1,0 +1,132 @@
+<div class="chatbot-container">
+    <header class="app-header">
+        <div class="header-content">
+            <button id="backBtn" class="btn btn-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <div class="logo-container-small">
+                <svg class="logo-icon-small" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="logo-text-small">Perxia Help Consultas</span>
+            </div>
+            <div class="header-actions">
+                <div class="model-selector">
+                    <label for="modelSelect" class="model-label">Modelo:</label>
+                    <select id="modelSelect" class="model-select">
+                        <option value="deepseek-v3">DeepSeek V3</option>
+                        <option value="deepseek-r1">DeepSeek R1 (DeepThink)</option>
+                    </select>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="chatbot-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">Conversaciones</h3>
+                <button id="newChatBtn" class="btn btn-icon" title="Nueva conversación">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="conversation-list" id="conversationList">
+                <!-- Conversations will be loaded here -->
+            </div>
+            <div class="sidebar-footer">
+                <button id="uploadDocsBtn" class="btn btn-secondary btn-full">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Subir Documentos
+                </button>
+            </div>
+        </aside>
+        
+        <main class="chat-main">
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <div class="welcome-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h2>¿En qué puedo ayudarte hoy?</h2>
+                    <p>Puedes hacerme preguntas sobre documentos técnicos, solicitar resúmenes o análisis profundos.</p>
+                    <div class="quick-actions">
+                        <button class="quick-action-btn">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Resumir documento
+                        </button>
+                        <button class="quick-action-btn">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 6H21M8 12H21M8 18H21M3 6H3.01M3 12H3.01M3 18H3.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Extraer puntos clave
+                        </button>
+                        <button class="quick-action-btn">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.663 17H4C3.46957 17 2.96086 16.7893 2.58579 16.4142C2.21071 16.0391 2 15.5304 2 15V8C2 7.46957 2.21071 6.96086 2.58579 6.58579C2.96086 6.21071 3.46957 6 4 6H20C20.5304 6 21.0391 6.21071 21.4142 6.58579C21.7893 6.96086 22 7.46957 22 8V15C22 15.5304 21.7893 16.0391 21.4142 16.4142C21.0391 16.7893 20.5304 17 20 17H14.337L12 22L9.663 17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Análisis técnico
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <div class="document-chips" id="documentChips">
+                    <!-- Document chips will appear here -->
+                </div>
+                <form id="chatForm" class="chat-form">
+                    <button type="button" id="attachBtn" class="btn btn-icon" title="Adjuntar archivo">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21.44 11.05L12.25 20.24C11.1242 21.3658 9.5916 21.9983 8.00001 21.9983C6.40841 21.9983 4.87582 21.3658 3.75001 20.24C2.62419 19.1142 1.99171 17.5816 1.99171 15.99C1.99171 14.3984 2.62419 12.8658 3.75001 11.74L12.94 2.55C13.7006 1.78936 14.7186 1.35883 15.78 1.35883C16.8414 1.35883 17.8594 1.78936 18.62 2.55C19.3806 3.31064 19.8112 4.32864 19.8112 5.39C19.8112 6.45136 19.3806 7.46936 18.62 8.23L9.41999 17.42C9.03968 17.8003 8.53071 18.0156 7.99999 18.0156C7.46928 18.0156 6.96031 17.8003 6.58 17.42C6.19969 17.0397 5.98438 16.5307 5.98438 16C5.98438 15.4693 6.19969 14.9603 6.58 14.58L15.07 6.1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <input type="file" id="fileInput" style="display: none;" multiple accept=".pdf,.doc,.docx,.txt,.md">
+                    <textarea 
+                        id="chatInput" 
+                        class="chat-input" 
+                        placeholder="Escribe tu pregunta o solicitud aquí..."
+                        rows="1"
+                    ></textarea>
+                    <button type="submit" id="sendBtn" class="btn btn-primary btn-icon" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </main>
+        
+        <aside class="info-panel" id="infoPanel">
+            <div class="info-panel-header">
+                <h3 class="info-panel-title">Documentos Cargados</h3>
+                <button id="closePanelBtn" class="btn btn-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="document-list" id="documentList">
+                <p class="empty-state">No hay documentos cargados</p>
+            </div>
+        </aside>
+    </div>
+</div>
