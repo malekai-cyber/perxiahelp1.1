@@ -20,12 +20,25 @@ Perxia_Help/
 │   ├── storage.js        # Azure Storage
 │   └── health.js         # Health checks
 ├── client/                # Frontend (SPA)
-│   ├── index.html
-│   ├── pages/            # Páginas HTML
-│   ├── css/              # Estilos
-│   ├── js/               # JavaScript del cliente
-│   └── config.js         # Config del cliente
-├── SETUP.md              # Guía de configuración detallada
+│   ├── index.html        # Landing page
+│   ├── config.js         # Config del cliente
+│   ├── pages/            
+│   │   ├── menu.html     # Menú principal
+│   │   ├── chatbot.html  # Consultas IA
+│   │   └── casos-exito.html  # Casos de éxito
+│   ├── css/              
+│   │   ├── variables.css # Sistema de diseño
+│   │   ├── landing.css   # Estilos landing
+│   │   ├── menu.css      # Estilos menú
+│   │   ├── chatbot.css   # Estilos chatbot
+│   │   └── casos-exito.css # Estilos casos
+│   └── js/               
+│       ├── auth.js       # Servicio autenticación
+│       ├── app-landing.js    # Lógica landing
+│       ├── app-menu.js       # Lógica menú
+│       ├── app-chatbot.js    # Lógica chatbot
+│       └── app-casos-exito.js # Lógica casos
+├── SETUP.md              # Guía de configuración
 └── README.md             # Este archivo
 ```
 

@@ -1,43 +1,168 @@
-<div class="casos-exito-container">
-    <header class="app-header">
-        <div class="header-content">
-            <button id="backBtn" class="btn btn-icon">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-            <div class="logo-container-small">
-                <svg class="logo-icon-small" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span class="logo-text-small">Perxia Help Casos de Éxito</span>
-            </div>
-            <div class="header-actions">
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">U</div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Perxia Help - Casos de Éxito">
+    <title>Perxia Help - Legacy</title>
+    <link rel="stylesheet" href="/css/variables.css">
+    <link rel="stylesheet" href="/css/casos-exito.css">
+</head>
+<body>
+    <div class="casos-app">
+        <!-- Background Effects -->
+        <div class="ambient-glow"></div>
+        <div class="grid-pattern"></div>
+
+        <!-- Header -->
+        <header class="casos-header">
+            <div class="header-left">
+                <button id="backBtn" class="icon-btn" title="Volver al menú">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <div class="header-brand">
+                    <div class="brand-icon">
+                        <svg viewBox="0 0 32 32\" fill=\"none\">
+                            <!-- Cabeza robot/casco piloto -->
+                            <path d="M16 4C11 4 7 8 7 13v3c0 2 1 3 2 3h1v-4c0-3 3-6 6-6s6 3 6 6v4h1c1 0 2-1 2-3v-3c0-5-4-9-9-9z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                            <!-- Visor/Ojos -->
+                            <rect x="11" y="12" width="4" height="3" rx="1" fill="currentColor" opacity="0.8"/>
+                            <rect x="17" y="12" width="4" height="3" rx="1" fill="currentColor" opacity="0.8"/>
+                            <!-- Antena -->
+                            <circle cx="16" cy="3" r="1.5" fill="currentColor"/>
+                            <line x1="16" y1="4.5" x2="16" y2="6" stroke="currentColor" stroke-width="1.5"/>
+                            <!-- Cuerpo -->
+                            <path d="M10 20h12v6c0 2-2 4-6 4s-6-2-6-4v-6z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                            <!-- Panel de control -->
+                            <rect x="13" y="22" width="6" height="4" rx="1" stroke="currentColor" stroke-width="1" fill="none"/>
+                            <circle cx="15" cy="24" r="0.8" fill="currentColor"/>
+                            <circle cx="17" cy="24" r="0.8" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-title">Perxia Help - Legacy</span>
+                        <span class="brand-subtitle">Base de conocimiento</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </header>
-    
-    <main class="casos-main">
-        <div class="casos-content">
-            <div class="section-header">
-                <h1 class="section-title">Perxia Help Casos de Éxito</h1>
-                <p class="section-subtitle">Consulta sobre PoCs, PoVs, herramientas y desarrollos realizados anteriormente en Periferia IT Group</p>
+            <div class="header-right">
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span>Conectado</span>
+                </div>
+                <div class="user-avatar" id="userAvatar">U</div>
             </div>
+        </header>
 
-            <div class="iframe-wrapper">
-                <iframe 
-                    id="copilotIframe"
-                    src="https://copilotstudio.microsoft.com/environments/Default-e1bdfea1-5fcd-44c1-8196-dfa7afddd8c5/bots/cr788_perxiaHelp/webchat?__version__=2" 
-                    frameborder="0"
-                    allowfullscreen
-                    aria-label="Chatbot de Casos de Éxito - Perxia Help">
-                </iframe>
+        <!-- Main Content -->
+        <main class="casos-main">
+            <!-- Sidebar Info -->
+            <aside class="casos-sidebar">
+                <div class="sidebar-content">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4M12 8h.01"/>
+                            </svg>
+                        </div>
+                        <h3>Perxia Help - Legacy</h3>
+                        <p>Base de conocimiento de proyectos, PoCs y desarrollos de Periferia IT Group</p>
+                    </div>
+
+                    <div class="capabilities-list">
+                        <h4>Puedes consultar sobre:</h4>
+                        <ul>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                <span>PoCs y PoVs realizados</span>
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                <span>Herramientas desarrolladas</span>
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                <span>Proyectos exitosos</span>
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                <span>Tecnologías utilizadas</span>
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                <span>Mejores prácticas</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="quick-questions">
+                        <h4>Preguntas sugeridas:</h4>
+                        <button class="question-chip" data-question="¿Qué PoCs se han realizado con Azure?">
+                            PoCs con Azure
+                        </button>
+                        <button class="question-chip" data-question="¿Qué herramientas de IA han desarrollado?">
+                            Herramientas de IA
+                        </button>
+                        <button class="question-chip" data-question="¿Cuáles son los proyectos más recientes?">
+                            Proyectos recientes
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Chat Container -->
+            <div class="chat-wrapper">
+                <div class="chat-frame">
+                    <div class="frame-header">
+                        <div class="frame-title">
+                            <div class="copilot-badge">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                                <span>Microsoft Copilot Studio</span>
+                            </div>
+                        </div>
+                        <button class="frame-action" id="refreshBtn" title="Recargar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 4v6h-6M1 20v-6h6"/>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="frame-content">
+                        <iframe 
+                            id="copilotFrame"
+                            src="https://copilotstudio.microsoft.com/environments/Default-e1bdfea1-5fcd-44c1-8196-dfa7afddd8c5/bots/cr788_helpIaConsultas/webchat?__version__=2" 
+                            frameborder="0"
+                            title="HelpIA Consultas"
+                        ></iframe>
+                        <div class="frame-loading" id="frameLoading">
+                            <div class="loading-spinner"></div>
+                            <span>Cargando asistente...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </main>
-</div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/config.js"></script>
+    <script src="https://alcdn.msauth.net/browser/2.38.1/js/msal-browser.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/app-casos-exito.js"></script>
+</body>
+</html>

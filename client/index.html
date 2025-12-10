@@ -3,119 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Perxia Help - Asistente IA Empresarial con Azure AD, DeepSeek V3 y R1">
-    <title>Perxia Help - Asistente IA Empresarial</title>
+    <meta name="description" content="Perxia Help - Asistente IA Empresarial">
+    <title>Perxia Help</title>
+    <link rel="stylesheet" href="/css/variables.css">
     <link rel="stylesheet" href="/css/landing.css">
 </head>
 <body>
-    <!-- Landing Page -->
-    <div class="landing-page">
-        <!-- Header -->
+    <div class="landing">
+        <!-- Ambient Background -->
+        <div class="ambient-glow"></div>
+
+        <!-- Minimal Header -->
         <header class="header">
-            <div class="container">
-                <div class="logo">
-                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>PERXIA HELP</span>
-                </div>
-                <div class="company">
-                    <span>Periferia IT Group</span>
-                </div>
-            </div>
+            <a href="/" class="brand">
+                <svg class="brand-icon" viewBox="0 0 32 32" fill="none">
+                    <!-- Cabeza robot/casco piloto -->
+                    <path d="M16 4C11 4 7 8 7 13v3c0 2 1 3 2 3h1v-4c0-3 3-6 6-6s6 3 6 6v4h1c1 0 2-1 2-3v-3c0-5-4-9-9-9z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    <!-- Visor/Ojos -->
+                    <rect x="11" y="12" width="4" height="3" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="17" y="12" width="4" height="3" rx="1" fill="currentColor" opacity="0.8"/>
+                    <!-- Antena -->
+                    <circle cx="16" cy="3" r="1.5" fill="currentColor"/>
+                    <line x1="16" y1="4.5" x2="16" y2="6" stroke="currentColor" stroke-width="1.5"/>
+                    <!-- Cuerpo -->
+                    <path d="M10 20h12v6c0 2-2 4-6 4s-6-2-6-4v-6z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    <!-- Panel de control/pecho -->
+                    <rect x="13" y="22" width="6" height="4" rx="1" stroke="currentColor" stroke-width="1" fill="none"/>
+                    <circle cx="15" cy="24" r="0.8" fill="currentColor"/>
+                    <circle cx="17" cy="24" r="0.8" fill="currentColor"/>
+                </svg>
+                <span>Perxia Help</span>
+            </a>
+            <span class="company">Periferia IT Group</span>
         </header>
 
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="container">
-                <div class="hero-content">
-                    <div class="hero-text">
-                        <div class="badge">✨ Potenciado con IA avanzada</div>
-                        <h1 class="hero-title">Revoluciona tu productividad con Perxia Help</h1>
-                        <p class="hero-subtitle">
-                            Asistente inteligente que combina Azure AD, DeepSeek V3 y R1, con análisis de documentos
-                            y acceso seguro a casos de éxito empresariales.
-                        </p>
+        <!-- Hero Centered -->
+        <main class="hero">
+            <div class="hero-content">
+                <h1>Tu asistente inteligente<br>para el día a día corporativo</h1>
+                <p class="hero-sub">Consultas, documentos y casos de éxito en un solo lugar.<br>Diseñado para equipos que necesitan respuestas rápidas y precisas.</p>
+                
+                <button id="loginBtn" class="login-btn">
+                    <svg class="ms-icon" viewBox="0 0 21 21" fill="none">
+                        <rect width="10" height="10" fill="#f25022"/>
+                        <rect x="11" width="10" height="10" fill="#7fba00"/>
+                        <rect y="11" width="10" height="10" fill="#00a4ef"/>
+                        <rect x="11" y="11" width="10" height="10" fill="#ffb900"/>
+                    </svg>
+                    Ingresar con Microsoft
+                </button>
+            </div>
 
-                        <!-- Stats -->
-                        <div class="stats">
-                            <div class="stat-item">
-                                <div class="stat-value">4+</div>
-                                <div class="stat-label">MODELOS DE IA</div>
-                            </div>
-                            <div class="stat-divider"></div>
-                            <div class="stat-item">
-                                <div class="stat-value">100%</div>
-                                <div class="stat-label">SEGURO</div>
-                            </div>
-                            <div class="stat-divider"></div>
-                            <div class="stat-item">
-                                <div class="stat-value">24/7</div>
-                                <div class="stat-label">DISPONIBLE</div>
-                            </div>
+            <!-- Preview Card -->
+            <div class="preview">
+                <div class="preview-window">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <span></span><span></span><span></span>
                         </div>
-
-                        <!-- CTA Button -->
-                        <button id="loginBtn" class="cta-button">
-                            <svg class="microsoft-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="1" y="1" width="10" height="10" fill="currentColor"/>
-                                <rect x="13" y="1" width="10" height="10" fill="currentColor"/>
-                                <rect x="1" y="13" width="10" height="10" fill="currentColor"/>
-                                <rect x="13" y="13" width="10" height="10" fill="currentColor"/>
-                            </svg>
-                            Acceder con Microsoft
-                        </button>
-
-                        <!-- Features -->
-                        <div class="features-tags">
-                            <span class="feature-tag">🔐 AZURE AD</span>
-                            <span class="feature-tag">🔒 ENCRIPTADO</span>
-                            <span class="feature-tag">🏢 EMPRESARIAL</span>
-                        </div>
+                        <span class="preview-title">Perxia Help</span>
                     </div>
-
-                    <!-- Chat Preview Mockup -->
-                    <div class="hero-visual">
-                        <div class="chat-preview">
-                            <div class="chat-header">
-                                <div class="chat-status">
-                                    <div class="status-dot"></div>
-                                    <span>Perxia Help activo</span>
-                                </div>
-                            </div>
-                            <div class="chat-messages">
-                                <div class="message bot">
-                                    <div class="message-avatar">🤖</div>
-                                    <div class="message-content">
-                                        <p>¡Hola! Soy Perxia Help. ¿En qué puedo ayudarte hoy?</p>
-                                    </div>
-                                </div>
-                                <div class="message user">
-                                    <div class="message-content">
-                                        <p>Necesito analizar un documento PDF</p>
-                                    </div>
-                                    <div class="message-avatar">👤</div>
-                                </div>
-                                <div class="message bot">
-                                    <div class="message-avatar">🤖</div>
-                                    <div class="message-content">
-                                        <p>¡Por supuesto! Puedes subir tu documento y lo analizaré con DeepSeek V3 o R1.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chat-input-preview">
-                                <span>Escribe tu mensaje...</span>
+                    <div class="preview-chat">
+                        <div class="chat-msg assistant">
+                            <div class="avatar">P</div>
+                            <div class="msg">¡Hola! Soy Perxia. ¿En qué puedo ayudarte hoy?</div>
+                        </div>
+                        <div class="chat-msg user">
+                            <div class="msg">Necesito un resumen del último informe de ventas</div>
+                        </div>
+                        <div class="chat-msg assistant">
+                            <div class="avatar">P</div>
+                            <div class="msg">
+                                <span class="typing">Analizando documento...</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </main>
+
+        <!-- Features Strip -->
+        <section class="features">
+            <article class="feature">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                </div>
+                <h3>Consultas Guiadas</h3>
+                <p>Escenarios preconfigurados para resolver dudas de negocio con contexto.</p>
+            </article>
+            <article class="feature">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                </div>
+                <h3>Documentos Inteligentes</h3>
+                <p>Resúmenes ejecutivos y técnicos que transforman archivos en acciones.</p>
+            </article>
+            <article class="feature">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                </div>
+                <h3>Casos de Éxito</h3>
+                <p>Historias validadas listas para compartir y acelerar decisiones.</p>
+            </article>
         </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 Periferia IT Group · Acceso exclusivo para colaboradores</p>
+        </footer>
     </div>
 
-    <!-- Scripts -->
     <script src="/config.js"></script>
     <script src="https://alcdn.msauth.net/browser/2.38.1/js/msal-browser.min.js"></script>
     <script src="/js/auth.js"></script>

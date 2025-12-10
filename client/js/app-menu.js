@@ -22,17 +22,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         const account = authService.getAccount();
 
         if (account) {
-            // Actualizar nombre del usuario
+            const { name } = account;
+
+            // Actualizar nombre del usuario en el header
             const userNameElement = document.getElementById('userName');
-            if (userNameElement && account.name) {
-                userNameElement.textContent = account.name;
+            if (userNameElement && name) {
+                userNameElement.textContent = name;
+            }
+
+            // Saludo personalizado en el hero
+            const heroUserNameElement = document.getElementById('heroUserName');
+            if (heroUserNameElement && name) {
+                heroUserNameElement.textContent = name.split(' ')[0];
             }
 
             // Actualizar avatar con iniciales
             const userAvatarElement = document.getElementById('userAvatar');
-            if (userAvatarElement && account.name) {
-                const initials = account.name
+            if (userAvatarElement && name) {
+                const initials = name
                     .split(' ')
+                    .filter(Boolean)
                     .map(word => word[0])
                     .join('')
                     .toUpperCase()
@@ -43,6 +52,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('✅ Usuario autenticado:', account.username);
         }
 
+        // Configurar navegación de botones principales
+        const routeButtons = document.querySelectorAll('[data-route]');
+        routeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetRoute = button.getAttribute('data-route');
+                if (targetRoute) {
+                    window.location.href = targetRoute;
+                }
+            });
+        });
+
         // Configurar botón de logout
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
@@ -50,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     console.log('👋 Cerrando sesión...');
                     logoutBtn.disabled = true;
-                    logoutBtn.textContent = 'Cerrando...';
+                    logoutBtn.style.opacity = '0.5';
                     
                     await authService.logout();
                     

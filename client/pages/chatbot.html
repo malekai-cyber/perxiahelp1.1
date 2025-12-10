@@ -1,132 +1,210 @@
-<div class="chatbot-container">
-    <header class="app-header">
-        <div class="header-content">
-            <button id="backBtn" class="btn btn-icon">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-            <div class="logo-container-small">
-                <svg class="logo-icon-small" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span class="logo-text-small">Perxia Help Consultas</span>
-            </div>
-            <div class="header-actions">
-                <div class="model-selector">
-                    <label for="modelSelect" class="model-label">Modelo:</label>
-                    <select id="modelSelect" class="model-select">
-                        <option value="deepseek-v3">DeepSeek V3</option>
-                        <option value="deepseek-r1">DeepSeek R1 (DeepThink)</option>
-                    </select>
-                </div>
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">U</div>
-                </div>
-            </div>
-        </div>
-    </header>
-    
-    <div class="chatbot-layout">
-        <aside class="sidebar">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perxia Help - Copilot</title>
+    <link rel="stylesheet" href="/css/variables.css">
+    <link rel="stylesheet" href="/css/chatbot.css">
+</head>
+<body>
+    <div class="chat-app" id="chatApp">
+        <div class="ambient-glow"></div>
+        <div class="grid-pattern"></div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h3 class="sidebar-title">Conversaciones</h3>
-                <button id="newChatBtn" class="btn btn-icon" title="Nueva conversación">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <a href="/pages/menu.html" class="brand">
+                    <svg class="brand-icon" viewBox="0 0 32 32" fill="none">
+                        <path d="M16 4C11 4 7 8 7 13v3c0 2 1 3 2 3h1v-4c0-3 3-6 6-6s6 3 6 6v4h1c1 0 2-1 2-3v-3c0-5-4-9-9-9z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                        <rect x="11" y="12" width="4" height="3" rx="1" fill="currentColor" opacity="0.8"/>
+                        <rect x="17" y="12" width="4" height="3" rx="1" fill="currentColor" opacity="0.8"/>
+                        <circle cx="16" cy="3" r="1.5" fill="currentColor"/>
+                        <line x1="16" y1="4.5" x2="16" y2="6" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M10 20h12v6c0 2-2 4-6 4s-6-2-6-4v-6z" stroke="currentColor" stroke-width="1.5" fill="none"/>
                     </svg>
-                </button>
+                    <span>Perxia Help</span>
+                </a>
+                <div class="sidebar-actions">
+                    <button id="newChatBtn" class="icon-btn" title="Nueva conversación">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                    </button>
+                    <button id="collapseSidebar" class="icon-btn" title="Ocultar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 17l-5-5 5-5"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <div class="conversation-list" id="conversationList">
-                <!-- Conversations will be loaded here -->
+
+            <div class="copilot-card">
+                <div class="copilot-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 2C7 2 3 6 3 11v2c0 1.5 1 2.5 2 2.5h1v-3c0-3.5 3-6 6-6s6 2.5 6 6v3h1c1 0 2-1 2-2.5v-2c0-5-4-9-9-9z"/>
+                        <rect x="8" y="10" width="3" height="2.5" rx="0.5" fill="currentColor"/>
+                        <rect x="13" y="10" width="3" height="2.5" rx="0.5" fill="currentColor"/>
+                        <path d="M8 17h8v4c0 1.5-2 3-4 3s-4-1.5-4-3v-4z"/>
+                    </svg>
+                </div>
+                <h3>Perxia Copilot</h3>
+                <p>Tu asistente de IA corporativo</p>
             </div>
+
+            <div class="sidebar-section">
+                <span class="section-label">Capacidades</span>
+                <div class="capability-list">
+                    <div class="capability-item">
+                        <span>📄</span>
+                        <span>Análisis de documentos</span>
+                    </div>
+                    <div class="capability-item">
+                        <span>🔍</span>
+                        <span>Búsqueda inteligente</span>
+                    </div>
+                    <div class="capability-item">
+                        <span>💬</span>
+                        <span>Lenguaje natural</span>
+                    </div>
+                    <div class="capability-item">
+                        <span>📊</span>
+                        <span>Resúmenes ejecutivos</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <span class="section-label">Tips</span>
+                <div class="tips-list">
+                    <p>💡 Sé específico para mejores respuestas</p>
+                    <p>📎 Adjunta documentos para análisis</p>
+                    <p>⚡ Usa Pro para razonamiento avanzado</p>
+                </div>
+            </div>
+
             <div class="sidebar-footer">
-                <button id="uploadDocsBtn" class="btn btn-secondary btn-full">
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Subir Documentos
-                </button>
+                <input type="file" id="fileInput" hidden multiple>
             </div>
         </aside>
-        
-        <main class="chat-main">
-            <div class="chat-messages" id="chatMessages">
-                <div class="welcome-message">
-                    <div class="welcome-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- Main -->
+        <main class="main-content">
+            <button id="expandSidebar" class="expand-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 17l5-5-5-5"/>
+                </svg>
+            </button>
+
+            <header class="chat-header">
+                <div class="header-left">
+                    <button id="backBtn" class="icon-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
                         </svg>
+                    </button>
+                    <div class="header-info">
+                        <h1>Perxia Help - Copilot</h1>
+                        <div class="header-meta">
+                            <span class="status-dot"></span>
+                            <span>En línea</span>
+                            <span class="sep">·</span>
+                            <span id="currentModelDisplay">Perxia Copilot</span>
+                        </div>
                     </div>
-                    <h2>¿En qué puedo ayudarte hoy?</h2>
-                    <p>Puedes hacerme preguntas sobre documentos técnicos, solicitar resúmenes o análisis profundos.</p>
-                    <div class="quick-actions">
-                        <button class="quick-action-btn">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Resumir documento
-                        </button>
-                        <button class="quick-action-btn">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8 6H21M8 12H21M8 18H21M3 6H3.01M3 12H3.01M3 18H3.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Extraer puntos clave
-                        </button>
-                        <button class="quick-action-btn">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9.663 17H4C3.46957 17 2.96086 16.7893 2.58579 16.4142C2.21071 16.0391 2 15.5304 2 15V8C2 7.46957 2.21071 6.96086 2.58579 6.58579C2.96086 6.21071 3.46957 6 4 6H20C20.5304 6 21.0391 6.21071 21.4142 6.58579C21.7893 6.96086 22 7.46957 22 8V15C22 15.5304 21.7893 16.0391 21.4142 16.4142C21.0391 16.7893 20.5304 17 20 17H14.337L12 22L9.663 17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Análisis técnico
-                        </button>
+                </div>
+                <div class="header-right">
+                    <button id="toggleDocsPanel" class="icon-btn" title="Documentos">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                    </button>
+                    <div class="user-avatar" id="userAvatar">U</div>
+                </div>
+            </header>
+
+            <div class="chat-container" id="chatMessages">
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-icon">✨</div>
+                    <h2>¿En qué puedo ayudarte?</h2>
+                    <p>Soy tu asistente de IA. Puedo analizar documentos, responder consultas y crear resúmenes.</p>
+                    
+                    <div class="suggestions">
+                        <button class="suggestion-btn" data-prompt="Resume el documento que te voy a compartir">📄 Resumir documento</button>
+                        <button class="suggestion-btn" data-prompt="Extrae los puntos clave">📋 Puntos clave</button>
+                        <button class="suggestion-btn" data-prompt="Realiza un análisis técnico">🔍 Análisis técnico</button>
+                        <button class="suggestion-btn" data-prompt="Compara estos documentos">📊 Comparar docs</button>
                     </div>
                 </div>
             </div>
-            
-            <div class="chat-input-container">
-                <div class="document-chips" id="documentChips">
-                    <!-- Document chips will appear here -->
-                </div>
-                <form id="chatForm" class="chat-form">
-                    <button type="button" id="attachBtn" class="btn btn-icon" title="Adjuntar archivo">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M21.44 11.05L12.25 20.24C11.1242 21.3658 9.5916 21.9983 8.00001 21.9983C6.40841 21.9983 4.87582 21.3658 3.75001 20.24C2.62419 19.1142 1.99171 17.5816 1.99171 15.99C1.99171 14.3984 2.62419 12.8658 3.75001 11.74L12.94 2.55C13.7006 1.78936 14.7186 1.35883 15.78 1.35883C16.8414 1.35883 17.8594 1.78936 18.62 2.55C19.3806 3.31064 19.8112 4.32864 19.8112 5.39C19.8112 6.45136 19.3806 7.46936 18.62 8.23L9.41999 17.42C9.03968 17.8003 8.53071 18.0156 7.99999 18.0156C7.46928 18.0156 6.96031 17.8003 6.58 17.42C6.19969 17.0397 5.98438 16.5307 5.98438 16C5.98438 15.4693 6.19969 14.9603 6.58 14.58L15.07 6.1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                    <input type="file" id="fileInput" style="display: none;" multiple accept=".pdf,.doc,.docx,.txt,.md">
-                    <textarea 
-                        id="chatInput" 
-                        class="chat-input" 
-                        placeholder="Escribe tu pregunta o solicitud aquí..."
-                        rows="1"
-                    ></textarea>
-                    <button type="submit" id="sendBtn" class="btn btn-primary btn-icon" disabled>
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
+
+            <div class="input-area">
+                <form id="chatForm" class="input-form">
+                    <div class="input-wrapper">
+                        <div class="model-selector" id="modelSelector">
+                            <button type="button" class="model-btn" id="modelBtn">
+                                <span id="modelBtnText">Copilot</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <div class="model-menu" id="modelMenu">
+                                <button type="button" class="model-item active" data-model="deepseek-chat">
+                                    <span class="model-name">Perxia Copilot</span>
+                                    <span class="model-desc">Rápido y eficiente</span>
+                                </button>
+                                <button type="button" class="model-item pro" data-model="deepseek-reasoner">
+                                    <span class="model-name">Perxia Copilot Pro <span class="pro-tag">PRO</span></span>
+                                    <span class="model-desc">Razonamiento avanzado</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <textarea id="chatInput" placeholder="Escribe tu consulta..." rows="1"></textarea>
+                        
+                        <button type="button" id="attachBtn" class="attach-btn" title="Adjuntar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                            </svg>
+                        </button>
+                        
+                        <button type="submit" id="sendBtn" class="send-btn" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"/>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <span class="input-hint">Enter enviar · Shift+Enter nueva línea</span>
                 </form>
             </div>
         </main>
-        
-        <aside class="info-panel" id="infoPanel">
-            <div class="info-panel-header">
-                <h3 class="info-panel-title">Documentos Cargados</h3>
-                <button id="closePanelBtn" class="btn btn-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- Docs Panel -->
+        <aside class="docs-panel" id="docsPanel">
+            <div class="docs-header">
+                <h3>Documentos</h3>
+                <button id="closePanelBtn" class="icon-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
                     </svg>
                 </button>
             </div>
-            <div class="document-list" id="documentList">
-                <p class="empty-state">No hay documentos cargados</p>
+            <div class="docs-content">
+                <div class="empty-state">
+                    <span>📄</span>
+                    <p>No hay documentos</p>
+                </div>
             </div>
         </aside>
     </div>
-</div>
+
+    <script src="/config.js"></script>
+    <script src="https://alcdn.msauth.net/browser/2.38.1/js/msal-browser.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/app-chatbot.js"></script>
+</body>
+</html>
