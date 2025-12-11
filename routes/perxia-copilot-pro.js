@@ -1,0 +1,268 @@
+// ============================================
+// PERXIA COPILOT PRO - PREMIUM MODEL ROUTES
+// Modelo avanzado con razonamiento profundo
+// Usa OpenAI SDK con Azure AI Foundry
+// Incluye RAG (Retrieval-Augmented Generation)
+// ============================================
+
+const express = require('express');
+const router = express.Router();
+const { AzureOpenAI } = require('openai');
+const searchService = require('../services/search-service');
+
+// Configuration for premium model (DeepSeek R1)
+const getConfig = () => ({
+    endpoint: process.env.DEEPSEEK_ENDPOINT,
+    apiKey: process.env.DEEPSEEK_API_KEY,
+    deploymentName: process.env.DEEPSEEK_DEPLOYMENT_R1 || 'DeepSeek-R1-0528',
+    apiVersion: process.env.DEEPSEEK_API_VERSION || '2024-05-01-preview'
+});
+
+// Validate configuration
+const validateConfig = () => {
+    const config = getConfig();
+    
+    if (!config.endpoint || config.endpoint.includes('your-')) {
+        return { valid: false, error: 'DEEPSEEK_ENDPOINT not configured' };
+    }
+    
+    if (!config.apiKey || config.apiKey.includes('your-')) {
+        return { valid: false, error: 'DEEPSEEK_API_KEY not configured' };
+    }
+    
+    return { valid: true, config };
+};
+
+// Create Azure OpenAI client
+const createClient = (config) => {
+    return new AzureOpenAI({
+        endpoint: config.endpoint,
+        apiKey: config.apiKey,
+        apiVersion: config.apiVersion,
+        deployment: config.deploymentName
+    });
+};
+
+// System prompt for Perxia Copilot Pro
+const SYSTEM_PROMPT = `Eres Perxia Copilot Pro, un asistente de IA premium con capacidades avanzadas de razonamiento.
+
+Tu rol es:
+- Proporcionar análisis profundos y detallados
+- Razonar paso a paso para resolver problemas complejos
+- Ofrecer insights estratégicos y recomendaciones fundamentadas
+- Abordar consultas técnicas avanzadas con precisión
+
+Directrices:
+- Usa razonamiento estructurado (paso a paso) cuando sea apropiado
+- Proporciona análisis más profundos y detallados
+- Considera múltiples perspectivas antes de concluir
+- Fundamenta tus respuestas con lógica clara
+- Responde siempre en español a menos que se indique lo contrario
+- Cuando uses información de documentos, cita la fuente específica
+
+Cuando sea apropiado, estructura tu respuesta así:
+1. **Análisis del problema**: Identificación de aspectos clave
+2. **Razonamiento**: Evaluación paso a paso
+3. **Conclusión**: Respuesta final con recomendaciones`;
+
+// Build context from RAG search results
+const buildDocumentContext = (searchResults) => {
+    if (!searchResults || searchResults.length === 0) {
+        return '';
+    }
+
+    let context = '\n\n📄 **CONTEXTO DE DOCUMENTOS RELEVANTES:**\n\n';
+    
+    searchResults.forEach((result, index) => {
+        context += `---\n`;
+        context += `**Documento ${index + 1}:** ${result.filename}\n`;
+        context += `**Relevancia:** ${(result.score * 100).toFixed(1)}%\n`;
+        context += `**Contenido:**\n${result.content}\n\n`;
+    });
+
+    context += '---\n\nAnaliza la información anterior de forma crítica y úsala para responder la consulta del usuario.';
+    
+    return context;
+};
+
+// Search for relevant documents using text search (low memory usage)
+const searchDocuments = async (query, maxResults = 5) => {
+    try {
+        // Usar textSearch en vez de hybridSearch para evitar problemas de memoria
+        const results = await searchService.textSearch(query, {
+            top: maxResults
+        });
+        
+        if (results && results.length > 0) {
+            console.log(`[RAG Pro] Found ${results.length} relevant documents`);
+            return results;
+        }
+        
+        return [];
+    } catch (error) {
+        console.log(`[RAG Pro] Search error (non-blocking): ${error.message}`);
+        return [];
+    }
+};
+
+// Chat completion endpoint with RAG
+router.post('/chat', async (req, res) => {
+    try {
+        const { messages, temperature = 0.5, max_tokens = 8192, useRAG = true } = req.body;
+        
+        if (!messages || !Array.isArray(messages) || messages.length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid request',
+                message: 'El array de mensajes es requerido'
+            });
+        }
+        
+        const validation = validateConfig();
+        
+        if (!validation.valid) {
+            console.log('[Perxia Copilot Pro] Config not valid:', validation.error);
+            return res.json(getMockResponse(messages));
+        }
+        
+        const config = validation.config;
+        
+        console.log(`[Perxia Copilot Pro] Endpoint: ${config.endpoint}`);
+        console.log(`[Perxia Copilot Pro] Deployment: ${config.deploymentName}`);
+        console.log(`[Perxia Copilot Pro] RAG Enabled: ${useRAG}`);
+        
+        // Get the last user message for RAG search
+        const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
+        let documentContext = '';
+        let ragResults = [];
+        
+        // Perform RAG search if enabled
+        if (useRAG && lastUserMessage) {
+            console.log(`[Perxia Copilot Pro] Searching documents for: "${lastUserMessage.content.substring(0, 50)}..."`);
+            ragResults = await searchDocuments(lastUserMessage.content, 5);
+            documentContext = buildDocumentContext(ragResults);
+        }
+        
+        // Create OpenAI client for Azure
+        const client = createClient(config);
+        
+        // Prepare messages with system prompt and document context
+        const systemPromptWithContext = SYSTEM_PROMPT + documentContext;
+        const fullMessages = [
+            { role: 'system', content: systemPromptWithContext },
+            ...messages
+        ];
+        
+        console.log(`[Perxia Copilot Pro] Sending request...`);
+        
+        const response = await client.chat.completions.create({
+            model: config.deploymentName,
+            messages: fullMessages,
+            max_tokens: max_tokens,
+            temperature: temperature,
+            top_p: 0.95
+        });
+        
+        const result = {
+            success: true,
+            content: response.choices[0].message.content,
+            model: 'Perxia Copilot Pro',
+            tokens: {
+                prompt: response.usage?.prompt_tokens || 0,
+                completion: response.usage?.completion_tokens || 0,
+                total: response.usage?.total_tokens || 0
+            },
+            finishReason: response.choices[0].finish_reason,
+            mock: false,
+            reasoning: true,
+            ragUsed: useRAG && ragResults.length > 0,
+            documentsUsed: ragResults.length > 0 ? ragResults.map(r => ({
+                filename: r.filename,
+                score: r.score
+            })) : []
+        };
+        
+        console.log(`[Perxia Copilot Pro] Response received. Tokens: ${result.tokens.total}, RAG docs: ${ragResults.length}`);
+        
+        res.json(result);
+        
+    } catch (error) {
+        console.error('[Perxia Copilot Pro] Error:', error.message);
+        console.error('[Perxia Copilot Pro] Full error:', error);
+        
+        // Return mock response on error for development
+        if (process.env.NODE_ENV !== 'production') {
+            return res.json(getMockResponse(req.body.messages, error.message));
+        }
+        
+        res.status(500).json({
+            success: false,
+            error: 'API Error',
+            message: error.message
+        });
+    }
+});
+
+// Get model info
+router.get('/info', (req, res) => {
+    const validation = validateConfig();
+    
+    res.json({
+        name: 'Perxia Copilot Pro',
+        description: 'Asistente de IA premium con razonamiento avanzado',
+        deployment: process.env.DEEPSEEK_DEPLOYMENT_R1,
+        maxTokens: 8192,
+        configured: validation.valid,
+        features: [
+            'Razonamiento profundo',
+            'Análisis paso a paso',
+            'Insights estratégicos',
+            'Consultas técnicas avanzadas',
+            'Mayor contexto de tokens'
+        ],
+        premium: true
+    });
+});
+
+// Mock response generator
+function getMockResponse(messages, errorMsg = null) {
+    const lastMessage = messages[messages.length - 1];
+    const userQuery = lastMessage?.content || 'tu consulta';
+    
+    const errorInfo = errorMsg ? `\n\n**Error técnico:** ${errorMsg}` : '';
+    
+    const mockContent = `⭐ **Perxia Copilot Pro** - Análisis Avanzado
+
+He recibido tu consulta: "${userQuery.substring(0, 100)}${userQuery.length > 100 ? '...' : ''}"
+
+---
+
+📋 **Modo Demostración**
+
+Actualmente estoy funcionando en modo demo.${errorInfo}
+
+**Para activar Copilot Pro completo:**
+1. Verifica que el deployment \`${process.env.DEEPSEEK_DEPLOYMENT_R1}\` exista en Azure AI Foundry
+2. Confirma que el endpoint y API key sean correctos
+3. Reinicia el servidor
+
+**Capacidades Premium:**
+- 🎯 Análisis estratégico profundo
+- 📊 Evaluación multi-perspectiva
+- 🔬 Razonamiento técnico avanzado
+- 📈 Recomendaciones fundamentadas
+
+¿En qué más puedo ayudarte?`;
+
+    return {
+        success: true,
+        content: mockContent,
+        model: 'Perxia Copilot Pro',
+        tokens: { prompt: 0, completion: 0, total: 0 },
+        finishReason: 'stop',
+        mock: true,
+        reasoning: true
+    };
+}
+
+module.exports = router;

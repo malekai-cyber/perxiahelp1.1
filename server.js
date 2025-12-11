@@ -16,9 +16,11 @@ dotenv.config();
 
 // Import routes
 const authRoutes = require('./routes/auth');
-const deepseekRoutes = require('./routes/deepseek');
+const perxiaCopilotRoutes = require('./routes/perxia-copilot');
+const perxiaCopilotProRoutes = require('./routes/perxia-copilot-pro');
 const storageRoutes = require('./routes/storage');
 const healthRoutes = require('./routes/health');
+const documentsRoutes = require('./routes/documents');
 
 // Initialize Express app
 const app = express();
@@ -84,11 +86,17 @@ app.use('/api/health', healthRoutes);
 // Authentication
 app.use('/api/auth', authRoutes);
 
-// DeepSeek AI
-app.use('/api/deepseek', deepseekRoutes);
+// Perxia Copilot AI (Standard)
+app.use('/api/copilot', perxiaCopilotRoutes);
+
+// Perxia Copilot Pro AI (Premium)
+app.use('/api/copilot-pro', perxiaCopilotProRoutes);
 
 // Storage
 app.use('/api/storage', storageRoutes);
+
+// Documents (RAG)
+app.use('/api/documents', documentsRoutes);
 
 // Serve static files (client)
 app.use(express.static(path.join(__dirname, 'client')));
@@ -143,8 +151,10 @@ app.listen(PORT, () => {
 API Endpoints:
   • Health: http://localhost:${PORT}/api/health
   • Auth: http://localhost:${PORT}/api/auth
-  • DeepSeek: http://localhost:${PORT}/api/deepseek
+  • Copilot: http://localhost:${PORT}/api/copilot
+  • Copilot Pro: http://localhost:${PORT}/api/copilot-pro
   • Storage: http://localhost:${PORT}/api/storage
+  • Documents (RAG): http://localhost:${PORT}/api/documents
 
 ⚠️  Make sure you have configured your .env file!
     `);

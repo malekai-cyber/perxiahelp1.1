@@ -1,285 +1,406 @@
-# Perxia Help - Guía de Configuración
+# Perxia Help - Guía de Configuración Completa
 
-## 📋 Requisitos Previos
-
-Antes de comenzar, necesitas tener configurado:
-
-1. **Azure App Registration** (para autenticación)
-2. **Azure AI Foundry** con DeepSeek deployment
-3. **Azure Storage Account** (opcional, para documentos)
-4. **Microsoft Copilot Studio** (opcional)
+Esta guía te ayudará a configurar todos los servicios de Azure necesarios para Perxia Help.
 
 ---
 
-## 🔐 Paso 1: Configurar Azure App Registration
+## 📋 Servicios de Azure Requeridos
 
-### 1.1 Crear App Registration
+| Servicio | Propósito | Tier Recomendado |
+|----------|-----------|------------------|
+| **App Registration** | Autenticación Azure AD | Free |
+| **Azure AI Foundry** | DeepSeek + Embeddings | Standard |
+| **Azure AI Search** | Búsqueda vectorial/semántica | Basic/Standard |
+| **Azure Document Intelligence** | Extracción de texto PDF/Word | S0 |
+| **Azure Storage Account** | Almacenamiento de documentos | Standard LRS |
+
+---
+
+## 🔐 Paso 1: Azure App Registration (Autenticación)
+
+### 1.1 Crear la App Registration
 
 1. Ve al [Azure Portal](https://portal.azure.com)
-2. Busca "App registrations" o "Registros de aplicaciones"
-3. Haz clic en **+ New registration**
-4. Completa:
+2. Busca **"App registrations"**
+3. Clic en **+ New registration**
+4. Configura:
    - **Name**: `Perxia Help`
-   - **Supported account types**: Selecciona según tu caso
+   - **Supported account types**: `Single tenant` (tu organización)
    - **Redirect URI**: 
      - Platform: `Single-page application (SPA)`
-     - URI: `http://localhost:8000`
-5. Haz clic en **Register**
+     - URI: `http://localhost:3000`
+5. Clic en **Register**
 
-### 1.2 Obtener valores necesarios
+### 1.2 Obtener Credenciales
 
-Después de crear la app, copia estos valores:
+En la página **Overview** de tu app, copia:
 
-- **Application (client) ID**: Lo encuentras en la página "Overview"
-- **Directory (tenant) ID**: También en "Overview"
+```
+AZURE_TENANT_ID=<Directory (tenant) ID>
+AZURE_CLIENT_ID=<Application (client) ID>
+```
 
-### 1.3 Configurar Authentication
+### 1.3 Crear Client Secret
 
-1. Ve a **Authentication** en el menú lateral
-2. En **Single-page application**, verifica que esté:
-   - `http://localhost:8000` ✅
-3. Agrega para producción:
-   - `https://tu-dominio.azurewebsites.net` (cuando despliegues)
-4. En **Implicit grant and hybrid flows**, habilita:
-   - ✅ **Access tokens**
-   - ✅ **ID tokens**
-5. Guarda cambios
+1. Ve a **Certificates & secrets**
+2. Clic en **+ New client secret**
+3. Descripción: `Perxia Help Backend`
+4. Expiración: 24 meses
+5. Copia el **Value** (solo se muestra una vez):
 
-### 1.4 Configurar API permissions (opcional)
+```
+AZURE_CLIENT_SECRET=<el valor del secret>
+```
 
-1. Ve a **API permissions**
-2. Permisos recomendados:
-   - `User.Read` (Microsoft Graph)
-   - `openid`
-   - `profile`
-   - `email`
+### 1.4 Configurar Redirect URIs
 
----
-
-## 🤖 Paso 2: Configurar DeepSeek en Azure AI Foundry
-
-### 2.1 Crear Azure AI Foundry Resource
-
-1. En Azure Portal, busca "Azure AI services"
-2. Crea un nuevo recurso de **Azure OpenAI** o **Azure AI Foundry**
-3. Completa:
-   - **Subscription**: Tu suscripción
-   - **Resource group**: Crea uno o usa existente
-   - **Region**: Selecciona región disponible
-   - **Name**: Ejemplo: `perxia-ai-foundry`
-   - **Pricing tier**: Standard S0
-
-### 2.2 Desplegar Modelos DeepSeek
-
-1. Ve al recurso creado
-2. Busca **Model deployments** o **Deployments**
-3. Haz clic en **+ Create new deployment**
-4. Selecciona:
-   - **Model**: `deepseek-v3` o `deepseek-r1`
-   - **Deployment name**: Ejemplo: `deepseek-v3`
-   - **Version**: Latest
-5. Espera a que se despliegue
-
-### 2.3 Obtener Endpoint y API Key
-
-1. Ve a **Keys and Endpoint** en el menú lateral
-2. Copia:
-   - **Endpoint**: Ejemplo: `https://perxia-ai-foundry.openai.azure.com/`
-   - **Key 1** o **Key 2**: Tu API Key
+1. Ve a **Authentication**
+2. En **Single-page application**, añade:
+   - `http://localhost:3000`
+   - `http://localhost:8080`
+   - `https://tu-dominio.azurewebsites.net` (producción)
+3. Habilita:
+   - ✅ Access tokens
+   - ✅ ID tokens
+4. Guarda cambios
 
 ---
 
-## 📦 Paso 3: Configurar Azure Storage (Opcional)
+## 🤖 Paso 2: Azure AI Foundry (DeepSeek + Embeddings)
 
-### 3.1 Crear Storage Account
+### 2.1 Crear el Recurso
 
-1. En Azure Portal, busca "Storage accounts"
-2. Crea nuevo:
-   - **Name**: Ejemplo: `perxiastorage`
-   - **Performance**: Standard
-   - **Replication**: LRS (más económico)
+1. Ve a [Azure AI Foundry](https://ai.azure.com)
+2. Crea un nuevo **Hub** y **Project**
+3. O busca "Azure AI services" en Azure Portal
 
-### 3.2 Crear Container
+### 2.2 Desplegar Modelos
 
-1. Ve al storage account creado
-2. En **Data storage** → **Containers**
-3. Crea nuevo container:
-   - **Name**: `documents`
-   - **Public access level**: Private
+Despliega estos 3 modelos:
 
-### 3.3 Generar SAS Token
+| Modelo | Deployment Name | Propósito |
+|--------|-----------------|-----------|
+| `DeepSeek-V3.1` | `DeepSeek-V3.1` | Chat estándar (Copilot) |
+| `DeepSeek-R1-0528` | `DeepSeek-R1-0528` | Chat avanzado (Copilot Pro) |
+| `text-embedding-3-small` | `text-embedding-3-small` | Embeddings para RAG |
 
-1. Ve a **Shared access signature** en el menú
-2. Configura permisos:
-   - ✅ Read
-   - ✅ Write
-   - ✅ Delete
-   - ✅ List
-3. Selecciona fecha de expiración
-4. Genera SAS token y copia
+### 2.3 Obtener Credenciales
 
----
+En **Keys and Endpoint** o en el proyecto de AI Foundry:
 
-## ⚙️ Paso 4: Configurar la Aplicación
-
-### 4.1 Crear archivo de configuración
-
-1. Copia `config.example.js` como `config.js`:
-   ```powershell
-   Copy-Item config.example.js config.js
-   ```
-
-2. Abre `config.js` y completa:
-
-```javascript
-const CONFIG = {
-    azure: {
-        auth: {
-            clientId: "abc123-def456-ghi789",              // Tu Client ID
-            authority: "https://login.microsoftonline.com/xyz789-abc123",  // Tu Tenant ID
-            redirectUri: "http://localhost:8000",
-            postLogoutRedirectUri: "http://localhost:8000",
-            scopes: ["openid", "profile", "email"]
-        },
-        cache: {
-            cacheLocation: "localStorage",
-            storeAuthStateInCookie: false
-        }
-    },
-
-    deepseek: {
-        endpoint: "https://perxia-ai-foundry.openai.azure.com/",  // Tu endpoint
-        apiKey: "tu-api-key-aqui",                                // Tu API Key
-        deploymentName: "deepseek-v3",                            // Tu deployment name
-        apiVersion: "2024-08-01-preview",
-        
-        models: {
-            v3: {
-                name: "deepseek-v3",
-                displayName: "DeepSeek V3",
-                maxTokens: 4096
-            },
-            r1: {
-                name: "deepseek-r1",
-                displayName: "DeepSeek R1 (DeepThink)",
-                maxTokens: 8192
-            }
-        }
-    },
-
-    storage: {
-        accountName: "perxiastorage",
-        containerName: "documents",
-        sasToken: "?sv=2021-06-08&ss=b&srt=sco&sp=rwdlac..."  // Tu SAS token
-    },
-
-    copilot: {
-        iframeUrl: ""  // Se configura desde la UI
-    },
-
-    app: {
-        name: "Perxia Help",
-        version: "1.0.0",
-        debug: true
-    }
-};
+```
+AZURE_OPENAI_ENDPOINT=https://tu-recurso.services.ai.azure.com/
+AZURE_OPENAI_API_KEY=<tu-api-key>
+DEEPSEEK_DEPLOYMENT_V3=DeepSeek-V3.1
+DEEPSEEK_DEPLOYMENT_R1=DeepSeek-R1-0528
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
+AZURE_OPENAI_API_VERSION=2024-12-01-preview
 ```
 
 ---
 
-## 🚀 Paso 5: Ejecutar Localmente
+## 🔍 Paso 3: Azure AI Search
 
-### 5.1 Iniciar servidor local
+### 3.1 Crear el Recurso
+
+1. En Azure Portal, busca **"Azure AI Search"**
+2. Clic en **+ Create**
+3. Configura:
+   - **Subscription**: Tu suscripción
+   - **Resource group**: El mismo grupo
+   - **Service name**: `perxia-search` (único globalmente)
+   - **Location**: Misma región que otros servicios
+   - **Pricing tier**: **Basic** (para producción) o **Free** (desarrollo)
+4. Clic en **Review + create**
+
+### 3.2 Obtener Credenciales
+
+1. Ve al recurso creado
+2. En **Settings** → **Keys**, copia:
+
+```
+AZURE_SEARCH_ENDPOINT=https://tu-search.search.windows.net
+AZURE_SEARCH_API_KEY=<Admin key>
+AZURE_SEARCH_INDEX_NAME=perxia-documents
+```
+
+> **Nota**: El índice se crea automáticamente al iniciar la aplicación.
+
+---
+
+## 📄 Paso 4: Azure Document Intelligence
+
+### 4.1 Crear el Recurso
+
+1. En Azure Portal, busca **"Document Intelligence"** (antes Form Recognizer)
+2. Clic en **+ Create**
+3. Configura:
+   - **Subscription**: Tu suscripción
+   - **Resource group**: El mismo grupo
+   - **Region**: Misma región que otros servicios
+   - **Name**: `perxia-doc-intel` (único)
+   - **Pricing tier**: **S0** (Standard)
+4. Clic en **Review + create**
+
+### 4.2 Obtener Credenciales
+
+1. Ve al recurso creado
+2. En **Keys and Endpoint**, copia:
+
+```
+AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT=https://tu-doc-intel.cognitiveservices.azure.com/
+AZURE_DOCUMENT_INTELLIGENCE_KEY=<Key 1>
+```
+
+---
+
+## 📦 Paso 5: Azure Storage Account
+
+### 5.1 Crear el Storage Account
+
+1. En Azure Portal, busca **"Storage accounts"**
+2. Clic en **+ Create**
+3. Configura:
+   - **Subscription**: Tu suscripción
+   - **Resource group**: El mismo grupo
+   - **Storage account name**: `perxiastorage` (único)
+   - **Region**: Misma región
+   - **Performance**: **Standard**
+   - **Redundancy**: **LRS** (más económico)
+4. Clic en **Review + create**
+
+### 5.2 Crear el Container
+
+1. Ve al Storage Account creado
+2. En **Data storage** → **Containers**
+3. Clic en **+ Container**
+4. Nombre: `documents`
+5. Access level: **Private**
+6. Clic en **Create**
+
+### 5.3 Obtener Credenciales
+
+1. En **Security + networking** → **Access keys**, copia:
+
+```
+AZURE_STORAGE_ACCOUNT_NAME=perxiastorage
+AZURE_STORAGE_ACCOUNT_KEY=<key1>
+AZURE_STORAGE_CONTAINER_NAME=documents
+AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=...
+```
+
+---
+
+## ⚙️ Paso 6: Configurar la Aplicación
+
+### 6.1 Crear archivo .env
 
 ```powershell
 cd c:\Users\danielgarcia\Desktop\Perxia_Help
-python -m http.server 8000
+Copy-Item .env.example .env
+code .env
 ```
 
-### 5.2 Abrir en navegador
+### 6.2 Completar todas las variables
 
-Ve a: http://localhost:8000
+Copia los valores obtenidos en los pasos anteriores:
 
-### 5.3 Probar funcionalidades
+```env
+# Server
+NODE_ENV=development
+PORT=3000
+CLIENT_URL=http://localhost:8080
 
-1. **Login con Azure AD**: Haz clic en el botón "Microsoft Azure AD"
-2. **Login con credenciales**: Usa cualquier email/password (demo)
-3. **Chatbot**: Escribe mensajes y verás respuestas de DeepSeek
-4. **Subir documentos**: Haz clic en adjuntar archivos
+# Azure AD
+AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+AZURE_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AZURE_REDIRECT_URI=http://localhost:3000/auth/callback
+
+# Azure AI Foundry
+AZURE_OPENAI_ENDPOINT=https://tu-recurso.services.ai.azure.com/
+AZURE_OPENAI_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+DEEPSEEK_DEPLOYMENT_V3=DeepSeek-V3.1
+DEEPSEEK_DEPLOYMENT_R1=DeepSeek-R1-0528
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
+AZURE_OPENAI_API_VERSION=2024-12-01-preview
+
+# Azure AI Search
+AZURE_SEARCH_ENDPOINT=https://tu-search.search.windows.net
+AZURE_SEARCH_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AZURE_SEARCH_INDEX_NAME=perxia-documents
+
+# Azure Document Intelligence
+AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT=https://tu-doc-intel.cognitiveservices.azure.com/
+AZURE_DOCUMENT_INTELLIGENCE_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Azure Storage
+AZURE_STORAGE_ACCOUNT_NAME=perxiastorage
+AZURE_STORAGE_ACCOUNT_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AZURE_STORAGE_CONTAINER_NAME=documents
+AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=...
+
+# Security
+JWT_SECRET=genera-un-valor-seguro-aqui
+SESSION_SECRET=genera-otro-valor-seguro-aqui
+```
 
 ---
 
-## 🔍 Verificar Configuración
+## 🚀 Paso 7: Ejecutar la Aplicación
 
-### Modo Debug Activado
+### 7.1 Instalar dependencias
 
-Con `debug: true`, verás mensajes en la consola del navegador (F12):
-
-```
-[PerxiaApp] Configuration loaded
-[AzureAuth] MSAL initialized successfully
-[DeepSeek] Sending message to DeepSeek
+```powershell
+npm install
 ```
 
-### Verificar en la consola:
+### 7.2 Iniciar en modo desarrollo
 
-1. Abre DevTools (F12)
-2. Ve a la pestaña **Console**
-3. Deberías ver logs de inicialización
-4. Si hay errores, revisa la configuración
+```powershell
+npm run dev
+```
+
+### 7.3 Inicializar el índice de búsqueda
+
+En otra terminal o usando Postman:
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:3000/api/documents/init-index" -Method POST
+```
+
+### 7.4 Abrir la aplicación
+
+- Frontend: http://localhost:3000
+- API Health: http://localhost:3000/api/health
+
+---
+
+## ✅ Verificar que Todo Funciona
+
+### 1. Health Check
+```powershell
+Invoke-RestMethod http://localhost:3000/api/health
+```
+
+Respuesta esperada:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-01-XX..."
+}
+```
+
+### 2. Subir un documento
+1. Abre http://localhost:3000
+2. Inicia sesión
+3. Ve al Chatbot
+4. Abre el panel de documentos (icono 📄)
+5. Arrastra un PDF o Word
+6. Espera el mensaje de éxito
+
+### 3. Preguntar sobre el documento
+1. En el chat, escribe: "¿De qué trata el documento?"
+2. El sistema buscará contexto relevante (RAG)
+3. Recibirás una respuesta basada en el contenido
 
 ---
 
 ## 🐛 Solución de Problemas
 
-### Error: "MSAL library not loaded"
-- La app funcionará en modo demo
-- Para Azure AD real, verifica que MSAL se cargue desde CDN
+### Error 401 en Document Intelligence
+- Verifica `AZURE_DOCUMENT_INTELLIGENCE_KEY`
+- Asegúrate de usar el endpoint completo con `/`
 
-### Error: "API Error: 401"
-- Verifica que el API Key sea correcto
-- Verifica que el endpoint termine en `/`
+### Error "Index not found" en Search
+- Ejecuta `POST /api/documents/init-index`
+- Verifica `AZURE_SEARCH_API_KEY`
 
-### Error: "API Error: 404"
-- Verifica que el deployment name sea correcto
-- Verifica que el modelo esté desplegado en Azure
+### Error de embeddings
+- Verifica que el modelo `text-embedding-3-small` esté desplegado
+- Revisa `AZURE_OPENAI_EMBEDDING_DEPLOYMENT`
 
-### Error: "Configuration file not found"
-- Asegúrate de haber creado `config.js` desde `config.example.js`
+### Documento no se procesa
+- Verifica que el archivo sea PDF o DOCX
+- Máximo 50 MB
+- Revisa los logs del servidor
 
----
-
-## 📝 Notas de Seguridad
-
-⚠️ **IMPORTANTE**:
-
-1. **NUNCA** subas `config.js` a Git (ya está en `.gitignore`)
-2. **NUNCA** compartas tu API Key públicamente
-3. Usa variables de entorno en producción
-4. Rota las API Keys periódicamente
-5. Usa SAS tokens con permisos mínimos necesarios
+### Out of Memory
+```powershell
+# Aumentar memoria en package.json si es necesario
+# NODE_OPTIONS=--max-old-space-size=4096
+```
 
 ---
 
-## 🔄 Para Producción
+## 🔒 Seguridad en Producción
 
-Cuando despliegues a Azure:
+### Checklist
+- [ ] Cambiar `JWT_SECRET` y `SESSION_SECRET` a valores únicos y seguros
+- [ ] Usar Azure Key Vault para almacenar secretos
+- [ ] Habilitar HTTPS en App Service
+- [ ] Configurar firewall en Storage Account
+- [ ] Limitar CORS origins a tu dominio
+- [ ] Rotar API keys periódicamente
+- [ ] Configurar Azure AD conditional access
 
-1. Actualiza `redirectUri` en config y Azure Portal
-2. Cambia `debug: false`
-3. Usa Azure Key Vault para secretos
-4. Configura CORS en Azure Storage
-5. Habilita HTTPS
+### Variables de Producción
+
+```env
+NODE_ENV=production
+CLIENT_URL=https://tu-dominio.azurewebsites.net
+AZURE_REDIRECT_URI=https://tu-dominio.azurewebsites.net/auth/callback
+ALLOWED_ORIGINS=https://tu-dominio.azurewebsites.net
+```
+
+---
+
+## 📦 Desplegar en Azure App Service
+
+### Usando Azure CLI
+
+```bash
+# 1. Crear App Service Plan
+az appservice plan create \
+  --resource-group perxia-rg \
+  --name perxia-plan \
+  --sku B1 \
+  --is-linux
+
+# 2. Crear Web App
+az webapp create \
+  --resource-group perxia-rg \
+  --plan perxia-plan \
+  --name perxia-help \
+  --runtime "NODE|18-lts"
+
+# 3. Configurar variables de entorno
+az webapp config appsettings set \
+  --resource-group perxia-rg \
+  --name perxia-help \
+  --settings @appsettings.json
+
+# 4. Desplegar
+az webapp deployment source config-zip \
+  --resource-group perxia-rg \
+  --name perxia-help \
+  --src perxia-help.zip
+```
+
+### Usando VS Code
+
+1. Instala la extensión Azure App Service
+2. Click derecho en el proyecto → Deploy to Web App
+3. Selecciona o crea tu App Service
+4. Configura las variables en Azure Portal
 
 ---
 
 ## 📞 Soporte
 
-Si tienes problemas:
-1. Verifica los logs en la consola (F12)
-2. Revisa esta guía paso a paso
-3. Verifica que todos los servicios estén creados en Azure
-4. Contacta al equipo de desarrollo
+- **Documentación**: Este archivo y README.md
+- **Issues**: Revisa los logs del servidor (`npm run dev`)
+- **Azure**: [Documentación oficial de Azure](https://docs.microsoft.com/azure)
 
 ---
 

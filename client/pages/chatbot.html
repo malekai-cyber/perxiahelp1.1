@@ -85,7 +85,7 @@
             </div>
 
             <div class="sidebar-footer">
-                <input type="file" id="fileInput" hidden multiple>
+                <input type="file" id="fileInput" hidden multiple accept=".pdf,.doc,.docx,.txt,.md,.json">
             </div>
         </aside>
 
@@ -164,6 +164,21 @@
                         
                         <textarea id="chatInput" placeholder="Escribe tu consulta..." rows="1"></textarea>
                         
+                        <button type="button" id="voiceBtn" class="voice-btn" title="Grabar voz">
+                            <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                <line x1="12" y1="19" x2="12" y2="23"/>
+                                <line x1="8" y1="23" x2="16" y2="23"/>
+                            </svg>
+                            <svg class="stop-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;">
+                                <rect x="6" y="6" width="12" height="12" rx="2"/>
+                            </svg>
+                            <div class="voice-waves" style="display:none;">
+                                <span></span><span></span><span></span><span></span>
+                            </div>
+                        </button>
+                        
                         <button type="button" id="attachBtn" class="attach-btn" title="Adjuntar">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
@@ -182,10 +197,10 @@
             </div>
         </main>
 
-        <!-- Docs Panel -->
+        <!-- Docs Panel - Enhanced for RAG -->
         <aside class="docs-panel" id="docsPanel">
             <div class="docs-header">
-                <h3>Documentos</h3>
+                <h3>📄 Base de Conocimientos</h3>
                 <button id="closePanelBtn" class="icon-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"/>
@@ -193,14 +208,57 @@
                     </svg>
                 </button>
             </div>
-            <div class="docs-content">
-                <div class="empty-state">
-                    <span>📄</span>
-                    <p>No hay documentos</p>
+            
+            <!-- Upload Zone -->
+            <div class="docs-upload-zone" id="docsUploadZone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                <span>Arrastra archivos aquí</span>
+                <small>PDF, DOCX, TXT, MD (máx 50MB)</small>
+            </div>
+            
+            <!-- Upload Progress -->
+            <div class="docs-progress" id="docsProgress" style="display: none;">
+                <div class="progress-info">
+                    <span id="uploadFileName">Procesando...</span>
+                    <span id="uploadStatus">Subiendo</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="uploadProgressFill"></div>
+                </div>
+            </div>
+            
+            <!-- Document List -->
+            <div class="docs-content" id="docsContent">
+                <div class="docs-list" id="docsList">
+                    <!-- Documents will be rendered here -->
+                </div>
+                <div class="docs-empty" id="docsEmpty">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <p>Sin documentos</p>
+                    <small>Sube documentos para que Copilot los use como contexto</small>
+                </div>
+            </div>
+            
+            <!-- RAG Toggle -->
+            <div class="docs-footer">
+                <label class="rag-toggle">
+                    <input type="checkbox" id="ragToggle" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Usar documentos en respuestas</span>
+                </label>
+                <div class="docs-stats" id="docsStats">
+                    <span id="docsCount">0 documentos</span>
                 </div>
             </div>
         </aside>
     </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <script src="/config.js"></script>
     <script src="https://alcdn.msauth.net/browser/2.38.1/js/msal-browser.min.js"></script>
