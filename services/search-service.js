@@ -276,33 +276,94 @@ class SearchService {
 
     /**
      * Elimina todos los chunks de un documento
+     * @param {string} documentId - ID del documento a eliminar
+     * @returns {Object} - Resultado de la eliminación
      */
     async deleteDocument(documentId) {
         if (!this.searchClient) {
             throw new Error('Search service not configured');
         }
 
+        console.log(`\n🗑️ ========== Deleting document: ${documentId} ==========`);
+
         try {
-            // Buscar todos los chunks del documento
+            // Paso 1: Buscar todos los chunks del documento
             const searchResults = await this.searchClient.search('*', {
                 filter: `documentId eq '${documentId}'`,
-                select: ['id'],
+                select: ['id', 'filename', 'chunkIndex'],
                 top: 1000
             });
 
-            const idsToDelete = [];
+            const chunksToDelete = [];
+            let filename = '';
+            
             for await (const result of searchResults.results) {
-                idsToDelete.push({ id: result.document.id });
+                chunksToDelete.push({ id: result.document.id });
+                if (!filename) filename = result.document.filename;
             }
 
-            if (idsToDelete.length > 0) {
-                await this.searchClient.deleteDocuments(idsToDelete);
-                console.log(`✅ Deleted ${idsToDelete.length} chunks for document: ${documentId}`);
+            console.log(`   📋 Found ${chunksToDelete.length} chunks to delete`);
+            console.log(`   📄 Document: ${filename || 'unknown'}`);
+
+            if (chunksToDelete.length === 0) {
+                console.log(`   ⚠️ No chunks found for document: ${documentId}`);
+                return { deleted: 0, verified: true, filename };
             }
 
-            return { deleted: idsToDelete.length };
+            // Paso 2: Eliminar en batches (máximo 1000 por batch)
+            const batchSize = 1000;
+            let totalDeleted = 0;
+
+            for (let i = 0; i < chunksToDelete.length; i += batchSize) {
+                const batch = chunksToDelete.slice(i, i + batchSize);
+                const deleteResult = await this.searchClient.deleteDocuments(batch);
+                
+                const successCount = deleteResult.results.filter(r => r.succeeded).length;
+                totalDeleted += successCount;
+                
+                console.log(`   🗑️ Batch ${Math.floor(i / batchSize) + 1}: deleted ${successCount}/${batch.length}`);
+            }
+
+            // Paso 3: Verificar que se eliminaron todos
+            // Esperar un momento para que el índice se actualice
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const verifyResults = await this.searchClient.search('*', {
+                filter: `documentId eq '${documentId}'`,
+                select: ['id'],
+                top: 1
+            });
+
+            let remainingCount = 0;
+            for await (const _ of verifyResults.results) {
+                remainingCount++;
+            }
+
+            const verified = remainingCount === 0;
+
+            if (verified) {
+                console.log(`   ✅ Successfully deleted ${totalDeleted} chunks`);
+                console.log(`   ✅ Verification: No remaining chunks`);
+            } else {
+                console.log(`   ⚠️ Deleted ${totalDeleted} chunks but ${remainingCount} still remain`);
+                // Intentar eliminar de nuevo los restantes
+                if (remainingCount > 0) {
+                    console.log(`   🔄 Retrying deletion of remaining chunks...`);
+                    await this.deleteDocument(documentId); // Recursivo
+                }
+            }
+
+            console.log(`   ========================================\n`);
+
+            return { 
+                deleted: totalDeleted, 
+                verified, 
+                filename,
+                documentId
+            };
         } catch (error) {
-            console.error('❌ Error deleting document:', error.message);
+            console.error(`   ❌ Error deleting document: ${error.message}`);
+            console.log(`   ========================================\n`);
             throw error;
         }
     }

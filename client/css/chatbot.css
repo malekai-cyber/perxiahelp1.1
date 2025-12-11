@@ -1516,6 +1516,26 @@ body {
     font-size: 0.75rem;
     color: var(--color-text-tertiary);
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.purge-btn {
+    background: rgba(200, 50, 50, 0.15);
+    border: 1px solid rgba(200, 50, 50, 0.3);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: #ff6b6b;
+    transition: all 0.2s ease;
+}
+
+.purge-btn:hover {
+    background: rgba(200, 50, 50, 0.3);
+    border-color: rgba(200, 50, 50, 0.5);
 }
 
 /* RAG Badge in Messages */

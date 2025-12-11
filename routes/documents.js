@@ -216,36 +216,118 @@ router.get('/stats', async (req, res) => {
 });
 
 /**
+ * DELETE /api/documents/purge-all
+ * Elimina TODOS los documentos del índice y storage
+ * ⚠️ USE WITH CAUTION - Esta ruta debe estar ANTES de /:documentId
+ */
+router.delete('/purge-all', async (req, res) => {
+    console.log('\n🗑️ ===== PURGING ALL DOCUMENTS =====');
+    
+    try {
+        // 1. Obtener lista de todos los documentos
+        const documents = await searchService.listDocuments();
+        console.log(`   📋 Found ${documents.length} documents to delete`);
+        
+        let totalChunksDeleted = 0;
+        let totalBlobsDeleted = 0;
+        const errors = [];
+
+        // 2. Eliminar cada documento
+        for (const doc of documents) {
+            try {
+                // Eliminar del índice
+                const deleteResult = await searchService.deleteDocument(doc.documentId);
+                totalChunksDeleted += deleteResult.deleted;
+
+                // Eliminar del blob storage
+                if (containerClient) {
+                    const blobs = containerClient.listBlobsFlat({ prefix: `${doc.documentId}/` });
+                    for await (const blob of blobs) {
+                        await containerClient.deleteBlob(blob.name);
+                        totalBlobsDeleted++;
+                    }
+                }
+            } catch (err) {
+                console.error(`   ❌ Error deleting ${doc.filename}:`, err.message);
+                errors.push({ documentId: doc.documentId, error: err.message });
+            }
+        }
+
+        console.log(`   ✅ Purge complete: ${totalChunksDeleted} chunks, ${totalBlobsDeleted} blobs`);
+        console.log(`   ========================================\n`);
+
+        res.json({
+            success: true,
+            message: 'Todos los documentos eliminados',
+            details: {
+                documentsProcessed: documents.length,
+                chunksDeleted: totalChunksDeleted,
+                blobsDeleted: totalBlobsDeleted,
+                errors: errors.length > 0 ? errors : undefined
+            }
+        });
+    } catch (error) {
+        console.error('❌ Error purging:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+/**
  * DELETE /api/documents/:documentId
- * Elimina un documento
+ * Elimina un documento completamente (índice + blob storage)
  */
 router.delete('/:documentId', async (req, res) => {
+    const { documentId } = req.params;
+    console.log(`\n🗑️ ===== DELETE Request for: ${documentId} =====`);
+
     try {
-        const { documentId } = req.params;
-        
-        // Eliminar del índice
+        // 1. Primero eliminar del índice de búsqueda (lo más importante)
         const deleteResult = await searchService.deleteDocument(documentId);
         
-        // Eliminar del blob storage
+        // 2. Luego eliminar del blob storage
+        let blobsDeleted = 0;
         if (containerClient) {
             try {
                 const blobs = containerClient.listBlobsFlat({ prefix: `${documentId}/` });
                 for await (const blob of blobs) {
                     await containerClient.deleteBlob(blob.name);
+                    blobsDeleted++;
+                    console.log(`   🗑️ Blob deleted: ${blob.name}`);
                 }
+                console.log(`   ✅ Deleted ${blobsDeleted} blobs from storage`);
             } catch (blobError) {
-                console.warn('Warning deleting blobs:', blobError.message);
+                console.warn('   ⚠️ Warning deleting blobs:', blobError.message);
             }
         }
 
+        // 3. Verificar que ya no existe en el índice
+        const remainingDocs = await searchService.listDocuments();
+        const stillExists = remainingDocs.some(d => d.documentId === documentId);
+
+        if (stillExists) {
+            console.log(`   ⚠️ Document still appears in list, may need refresh`);
+        }
+
+        console.log(`   ✅ Delete complete\n`);
+
         res.json({
             success: true,
-            message: 'Documento eliminado',
-            chunksDeleted: deleteResult.deleted
+            message: 'Documento eliminado correctamente',
+            details: {
+                documentId,
+                filename: deleteResult.filename || 'unknown',
+                chunksDeleted: deleteResult.deleted,
+                blobsDeleted,
+                verified: deleteResult.verified
+            }
         });
     } catch (error) {
-        console.error('Error deleting document:', error);
-        res.status(500).json({ success: false, error: error.message });
+        console.error('❌ Error deleting document:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message,
+            documentId 
+        });
     }
 });
 

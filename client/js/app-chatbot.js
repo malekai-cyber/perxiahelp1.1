@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const docsEmpty = document.getElementById('docsEmpty');
         const docsCount = document.getElementById('docsCount');
         const ragToggle = document.getElementById('ragToggle');
+        const purgeAllBtn = document.getElementById('purgeAllBtn');
         const toastContainer = document.getElementById('toastContainer');
         
         // ===== State =====
@@ -167,6 +168,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         function renderDocumentsList() {
             if (!docsList || !docsEmpty || !docsCount) return;
+            
+            // Show/hide purge button based on document count
+            if (purgeAllBtn) {
+                purgeAllBtn.style.display = uploadedDocuments.length > 0 ? 'inline-block' : 'none';
+            }
             
             if (uploadedDocuments.length === 0) {
                 docsList.innerHTML = '';
@@ -278,6 +284,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         async function deleteDocument(documentId) {
             try {
+                // Mostrar indicador de eliminación
+                showToast('Eliminando documento...', 'info');
+                
                 const response = await fetch(`/api/documents/${documentId}`, {
                     method: 'DELETE'
                 });
@@ -285,14 +294,54 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const data = await response.json();
                 
                 if (data.success) {
-                    showToast('Documento eliminado', 'success');
+                    const details = data.details || {};
+                    const chunksDeleted = details.chunksDeleted || 0;
+                    const filename = details.filename || 'documento';
+                    
+                    showToast(`"${filename}" eliminado (${chunksDeleted} fragmentos)`, 'success');
+                    
+                    // Esperar un momento y recargar la lista
+                    await new Promise(resolve => setTimeout(resolve, 500));
                     await loadDocuments();
+                    
+                    // Verificar que se eliminó de la lista
+                    const stillExists = uploadedDocuments.some(d => d.documentId === documentId);
+                    if (stillExists) {
+                        console.warn('⚠️ Document still in list after delete, refreshing...');
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        await loadDocuments();
+                    }
                 } else {
                     throw new Error(data.error || 'Error al eliminar');
                 }
             } catch (error) {
                 console.error('Error deleting:', error);
                 showToast(`Error al eliminar: ${error.message}`, 'error');
+            }
+        }
+
+        async function purgeAllDocuments() {
+            try {
+                showToast('Eliminando todos los documentos...', 'info');
+                
+                const response = await fetch('/api/documents/purge-all', {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const details = data.details || {};
+                    showToast(`Eliminados ${details.documentsProcessed || 0} documentos (${details.chunksDeleted || 0} fragmentos)`, 'success');
+                    
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await loadDocuments();
+                } else {
+                    throw new Error(data.error || 'Error al purgar');
+                }
+            } catch (error) {
+                console.error('Error purging:', error);
+                showToast(`Error: ${error.message}`, 'error');
             }
         }
 
@@ -317,6 +366,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             ragToggle.addEventListener('change', () => {
                 useRAG = ragToggle.checked;
                 console.log('🔄 RAG:', useRAG ? 'Activado' : 'Desactivado');
+            });
+        }
+
+        // ===== Purge All Documents =====
+        if (purgeAllBtn) {
+            purgeAllBtn.addEventListener('click', async () => {
+                if (confirm('⚠️ ¿Eliminar TODOS los documentos?\n\nEsta acción no se puede deshacer.')) {
+                    await purgeAllDocuments();
+                }
             });
         }
 
