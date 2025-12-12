@@ -3,12 +3,14 @@
 // Modelo avanzado con razonamiento profundo
 // Usa OpenAI SDK con Azure AI Foundry
 // Incluye RAG (Retrieval-Augmented Generation)
+// Incluye Hub Search (Casos de Éxito, PoCs)
 // ============================================
 
 const express = require('express');
 const router = express.Router();
 const { AzureOpenAI } = require('openai');
 const searchService = require('../services/search-service');
+const hubSearchService = require('../server/services/hub-search-service');
 
 // Configuration for premium model (DeepSeek R1)
 const getConfig = () => ({
@@ -105,6 +107,65 @@ const searchDocuments = async (query, maxResults = 5) => {
     }
 };
 
+// Detectar si la pregunta es sobre casos de éxito, PoCs, herramientas de Periferia IT
+const shouldSearchHub = (query) => {
+    const queryLower = query.toLowerCase();
+    const hubKeywords = [
+        'caso de éxito', 'casos de éxito', 'caso de exito', 'casos de exito',
+        'poc', 'pocs', 'pov', 'povs', 'proof of concept', 'proof of value',
+        'herramienta', 'herramientas', 'proyecto', 'proyectos',
+        'periferia it', 'periferia', 'cliente', 'clientes',
+        'qué se ha hecho', 'que se ha hecho', 'qué proyectos', 'que proyectos',
+        'qué casos', 'que casos', 'experiencia con', 'trabajado con',
+        'implementación', 'implementacion', 'desarrollado',
+        'semillero', 'semilleros'
+    ];
+    
+    return hubKeywords.some(keyword => queryLower.includes(keyword));
+};
+
+// Buscar en el Hub (Casos de Éxito, PoCs, etc.)
+const searchHubContext = async (query, maxResults = 5) => {
+    try {
+        if (!hubSearchService || !hubSearchService.client) {
+            console.log('[Hub RAG Pro] Hub Search Service no disponible');
+            return { context: '', items: [] };
+        }
+        
+        const results = await hubSearchService.searchForContext(query, maxResults);
+        
+        if (results.success && results.items && results.items.length > 0) {
+            console.log(`[Hub RAG Pro] Found ${results.items.length} relevant items from Hub`);
+            return {
+                context: results.context,
+                items: results.items.map(item => ({
+                    title: item.enrichedTitle || 'Sin título',
+                    type: item.enrichedType || 'documento',
+                    tags: item.enrichedTags || []
+                }))
+            };
+        }
+        
+        return { context: '', items: [] };
+    } catch (error) {
+        console.log(`[Hub RAG Pro] Search error (non-blocking): ${error.message}`);
+        return { context: '', items: [] };
+    }
+};
+
+// Build context from Hub search results
+const buildHubContext = (hubResult) => {
+    if (!hubResult.context) {
+        return '';
+    }
+
+    let context = '\n\n🏆 **CONTEXTO DE CASOS DE ÉXITO Y PROYECTOS DE PERIFERIA IT:**\n\n';
+    context += hubResult.context;
+    context += '\n\n---\n\nUsa esta información sobre casos de éxito, PoCs y proyectos de Periferia IT para tu análisis cuando sea relevante.';
+    
+    return context;
+};
+
 // Chat completion endpoint with RAG
 router.post('/chat', async (req, res) => {
     try {
@@ -134,20 +195,32 @@ router.post('/chat', async (req, res) => {
         // Get the last user message for RAG search
         const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
         let documentContext = '';
+        let hubContext = '';
         let ragResults = [];
+        let hubResults = { context: '', items: [] };
         
         // Perform RAG search if enabled
         if (useRAG && lastUserMessage) {
-            console.log(`[Perxia Copilot Pro] Searching documents for: "${lastUserMessage.content.substring(0, 50)}..."`);
-            ragResults = await searchDocuments(lastUserMessage.content, 5);
+            const userQuery = lastUserMessage.content;
+            console.log(`[Perxia Copilot Pro] Searching documents for: "${userQuery.substring(0, 50)}..."`);
+            
+            // Búsqueda en documentos del usuario
+            ragResults = await searchDocuments(userQuery, 5);
             documentContext = buildDocumentContext(ragResults);
+            
+            // Búsqueda en Hub (Casos de Éxito, PoCs) si la pregunta lo amerita
+            if (shouldSearchHub(userQuery)) {
+                console.log(`[Perxia Copilot Pro] Query matches Hub keywords, searching Hub...`);
+                hubResults = await searchHubContext(userQuery, 5);
+                hubContext = buildHubContext(hubResults);
+            }
         }
         
         // Create OpenAI client for Azure
         const client = createClient(config);
         
-        // Prepare messages with system prompt and document context
-        const systemPromptWithContext = SYSTEM_PROMPT + documentContext;
+        // Prepare messages with system prompt, document context, and hub context
+        const systemPromptWithContext = SYSTEM_PROMPT + documentContext + hubContext;
         const fullMessages = [
             { role: 'system', content: systemPromptWithContext },
             ...messages
@@ -163,6 +236,7 @@ router.post('/chat', async (req, res) => {
             top_p: 0.95
         });
         
+        const hubItemsUsed = hubResults.items.length > 0;
         const result = {
             success: true,
             content: response.choices[0].message.content,
@@ -175,14 +249,16 @@ router.post('/chat', async (req, res) => {
             finishReason: response.choices[0].finish_reason,
             mock: false,
             reasoning: true,
-            ragUsed: useRAG && ragResults.length > 0,
+            ragUsed: useRAG && (ragResults.length > 0 || hubItemsUsed),
             documentsUsed: ragResults.length > 0 ? ragResults.map(r => ({
                 filename: r.filename,
                 score: r.score
-            })) : []
+            })) : [],
+            hubUsed: hubItemsUsed,
+            hubItemsUsed: hubResults.items
         };
         
-        console.log(`[Perxia Copilot Pro] Response received. Tokens: ${result.tokens.total}, RAG docs: ${ragResults.length}`);
+        console.log(`[Perxia Copilot Pro] Response received. Tokens: ${result.tokens.total}, RAG docs: ${ragResults.length}, Hub items: ${hubResults.items.length}`);
         
         res.json(result);
         

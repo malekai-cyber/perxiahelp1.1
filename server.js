@@ -21,6 +21,7 @@ const perxiaCopilotProRoutes = require('./routes/perxia-copilot-pro');
 const storageRoutes = require('./routes/storage');
 const healthRoutes = require('./routes/health');
 const documentsRoutes = require('./routes/documents');
+const hubRoutes = require('./server/routes/hub');
 
 // Initialize Express app
 const app = express();
@@ -97,6 +98,9 @@ app.use('/api/storage', storageRoutes);
 
 // Documents (RAG)
 app.use('/api/documents', documentsRoutes);
+
+// Periferia IT Hub (Casos de éxito, PoCs, Herramientas)
+app.use('/api/hub', hubRoutes);
 
 // Serve static files (client)
 app.use(express.static(path.join(__dirname, 'client')));
