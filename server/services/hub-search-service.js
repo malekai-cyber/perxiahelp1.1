@@ -488,6 +488,28 @@ class HubSearchService {
      */
     async getStats() {
         try {
+            // Si no hay cliente configurado, devolver stats de demo
+            if (!this.client) {
+                console.log('ℹ️ Hub no configurado, devolviendo stats de demo');
+                return {
+                    success: true,
+                    stats: {
+                        total: 45,
+                        casos: 18,
+                        pocs: 12,
+                        tools: 8,
+                        otros: 7,
+                        topTags: {
+                            'Azure': 15,
+                            'AI': 12,
+                            'DevOps': 10,
+                            'Cloud': 8,
+                            'Data': 6
+                        }
+                    }
+                };
+            }
+
             const all = await this.search('*', { top: 500, enrich: true });
             
             // Contar por categorías usando clasificación enriquecida

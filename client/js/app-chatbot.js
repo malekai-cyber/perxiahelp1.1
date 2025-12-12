@@ -1572,6 +1572,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Load Hub stats for sidebar badges
         await loadHubStats();
 
+        // Check for pending prompt from menu navigation
+        const pendingPrompt = sessionStorage.getItem('pendingPrompt');
+        if (pendingPrompt) {
+            sessionStorage.removeItem('pendingPrompt');
+            // Small delay to ensure UI is ready
+            setTimeout(() => {
+                chatInput.value = pendingPrompt;
+                chatForm.dispatchEvent(new Event('submit'));
+            }, 300);
+        }
+
         console.log('✅ Chatbot con RAG inicializado correctamente');
 
     } catch (error) {

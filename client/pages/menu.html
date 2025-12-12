@@ -61,38 +61,34 @@
                 </div>
             </section>
 
-            <!-- Quick Actions -->
-            <section class="quick-actions">
-                <div class="action-card primary" data-route="/pages/chatbot.html">
-                    <div class="card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                        </svg>
+            <!-- Main Action - Perxia Copilot -->
+            <section class="main-action">
+                <div class="copilot-card" data-route="/pages/chatbot.html">
+                    <div class="copilot-visual">
+                        <div class="copilot-icon-wrapper">
+                            <div class="copilot-icon-bg"></div>
+                            <svg class="copilot-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                <circle cx="9" cy="10" r="1" fill="currentColor"/>
+                                <circle cx="15" cy="10" r="1" fill="currentColor"/>
+                                <path d="M9 14s1.5 1.5 3 1.5 3-1.5 3-1.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="copilot-glow"></div>
                     </div>
-                    <div class="card-content">
+                    <div class="copilot-content">
+                        <div class="copilot-badge">Asistente IA</div>
                         <h2>Perxia Copilot</h2>
-                        <p>Tu asistente integral: analiza documentos, consulta casos de éxito, PoCs, y obtén respuestas precisas con IA avanzada.</p>
+                        <p>Tu asistente integral con IA avanzada. Analiza documentos, consulta casos de éxito, PoCs, y obtén respuestas precisas al instante.</p>
+                        <div class="copilot-features">
+                            <span class="feature-tag">📄 Documentos</span>
+                            <span class="feature-tag">🏆 Casos de Éxito</span>
+                            <span class="feature-tag">🔬 PoCs & PoVs</span>
+                            <span class="feature-tag">🧠 IA Avanzada</span>
+                        </div>
                     </div>
-                    <div class="card-arrow">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                            <polyline points="12 5 19 12 12 19"/>
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="action-card secondary" data-route="/pages/casos-exito.html">
-                    <div class="card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                            <polyline points="22 4 12 14.01 9 11.01"/>
-                        </svg>
-                    </div>
-                    <div class="card-content">
-                        <h2>Perxia Legacy</h2>
-                        <p>Accede directamente a la base de conocimiento de Copilot Studio con PoCs e historiales.</p>
-                    </div>
-                    <div class="card-arrow">
+                    <div class="copilot-cta">
+                        <span>Iniciar conversación</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="5" y1="12" x2="19" y2="12"/>
                             <polyline points="12 5 19 12 12 19"/>
@@ -101,60 +97,171 @@
                 </div>
             </section>
 
-            <!-- Stats & Info -->
-            <section class="info-section">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                                <line x1="3" y1="9" x2="21" y2="9"/>
-                                <line x1="9" y1="21" x2="9" y2="9"/>
-                            </svg>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-value">DeepSeek V3 · R1</span>
-                            <span class="stat-label">Modelos IA activos</span>
-                        </div>
+            <!-- Quick Access Cards -->
+            <section class="quick-access">
+                <div class="quick-card" data-action="casos">
+                    <div class="quick-icon casos">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 15l-2-2m0 0l-2-2m2 2l2-2m-2 2v6"/>
+                            <path d="M8 21h8"/>
+                            <path d="M12 3v6"/>
+                            <circle cx="12" cy="12" r="9"/>
+                        </svg>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-value">+350</span>
-                            <span class="stat-label">Documentos procesados</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon online">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                <polyline points="22 4 12 14.01 9 11.01"/>
-                            </svg>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-value status-online">Sistema operativo</span>
-                            <span class="stat-label">Estado del servicio</span>
-                        </div>
+                    <div class="quick-info">
+                        <span class="quick-value" id="casosCount"><span class="value-loader"></span></span>
+                        <span class="quick-label">Casos de Éxito</span>
                     </div>
                 </div>
-
-                <!-- News Card -->
-                <div class="news-card">
-                    <div class="news-badge">Novedades</div>
-                    <h3>DeepSeek R1 disponible</h3>
-                    <p>El nuevo modelo con razonamiento avanzado ya está listo para tus consultas más complejas.</p>
-                    <a href="#" class="news-link">
-                        Conocer más
+                <div class="quick-card" data-action="pocs">
+                    <div class="quick-icon pocs">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                            <polyline points="12 5 19 12 12 19"/>
+                            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.5"/>
+                            <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.5"/>
                         </svg>
-                    </a>
+                    </div>
+                    <div class="quick-info">
+                        <span class="quick-value" id="pocsCount"><span class="value-loader"></span></span>
+                        <span class="quick-label">PoCs & PoVs</span>
+                    </div>
+                </div>
+                <div class="quick-card" data-action="docs">
+                    <div class="quick-icon docs">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                    </div>
+                    <div class="quick-info">
+                        <span class="quick-value" id="docsCount"><span class="value-loader"></span></span>
+                        <span class="quick-label">Documentos</span>
+                    </div>
+                </div>
+                <div class="quick-card status">
+                    <div class="quick-icon online">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                    </div>
+                    <div class="quick-info">
+                        <span class="quick-value status-online">Operativo</span>
+                        <span class="quick-label">Estado del sistema</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tips Section -->
+            <section class="tips-section">
+                <div class="tips-card">
+                    <div class="tips-header">
+                        <span class="tips-icon">💡</span>
+                        <h3>Sugerencias para empezar</h3>
+                    </div>
+                    <div class="tips-list">
+                        <button class="tip-item" data-prompt="¿Cuáles son los casos de éxito más relevantes?">
+                            <span>🏆</span> Ver casos de éxito destacados
+                        </button>
+                        <button class="tip-item" data-prompt="¿Qué PoCs tenemos disponibles?">
+                            <span>🔬</span> Explorar pruebas de concepto
+                        </button>
+                        <button class="tip-item" data-prompt="¿Cómo puedo subir y analizar un documento?">
+                            <span>📄</span> Analizar mis documentos
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Grid -->
+            <section class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                    </div>
+                    <h4>IA Avanzada</h4>
+                    <p>Modelos de última generación con razonamiento profundo</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <h4>Búsqueda Semántica</h4>
+                    <p>Encuentra información relevante con lenguaje natural</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <h4>Análisis de Docs</h4>
+                    <p>Sube PDFs y obtén respuestas contextualizadas</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h4>Respuestas Rápidas</h4>
+                    <p>Información precisa en segundos, no horas</p>
+                </div>
+            </section>
+
+            <!-- Knowledge Distribution -->
+            <section class="distribution-section">
+                <div class="distribution-card">
+                    <div class="distribution-header">
+                        <h3>📊 Base de Conocimiento</h3>
+                        <span class="distribution-total" id="totalItems">Cargando...</span>
+                    </div>
+                    <div class="distribution-chart">
+                        <div class="chart-bars">
+                            <div class="chart-bar-container">
+                                <div class="chart-bar casos" id="barCasos" style="--percent: 0%"></div>
+                                <div class="chart-bar-label">
+                                    <span class="bar-icon">🏆</span>
+                                    <span class="bar-name">Casos de Éxito</span>
+                                    <span class="bar-value" id="barCasosValue">-</span>
+                                </div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="chart-bar pocs" id="barPocs" style="--percent: 0%"></div>
+                                <div class="chart-bar-label">
+                                    <span class="bar-icon">🔬</span>
+                                    <span class="bar-name">PoCs & PoVs</span>
+                                    <span class="bar-value" id="barPocsValue">-</span>
+                                </div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="chart-bar tools" id="barTools" style="--percent: 0%"></div>
+                                <div class="chart-bar-label">
+                                    <span class="bar-icon">🛠️</span>
+                                    <span class="bar-name">Herramientas</span>
+                                    <span class="bar-value" id="barToolsValue">-</span>
+                                </div>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="chart-bar otros" id="barOtros" style="--percent: 0%"></div>
+                                <div class="chart-bar-label">
+                                    <span class="bar-icon">📁</span>
+                                    <span class="bar-name">Otros recursos</span>
+                                    <span class="bar-value" id="barOtrosValue">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="distribution-footer">
+                        <div class="top-tags" id="topTags">
+                            <span class="tags-label">Tags populares:</span>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
