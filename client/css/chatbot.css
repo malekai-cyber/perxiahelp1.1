@@ -160,12 +160,14 @@ body {
     box-shadow: 0 4px 20px rgba(0, 200, 150, 0.15);
 }
 
-.copilot-avatar svg {
-    width: 26px;
-    height: 26px;
+.copilot-avatar svg,
+.copilot-avatar img {
+    width: 32px;
+    height: 32px;
     flex-shrink: 0;
     color: var(--color-primary-light);
     filter: drop-shadow(0 0 8px rgba(0, 200, 150, 0.4));
+    object-fit: contain;
 }
 
 .copilot-card h3 {

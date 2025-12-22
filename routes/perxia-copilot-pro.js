@@ -46,13 +46,20 @@ const createClient = (config) => {
 };
 
 // System prompt for Perxia Copilot Pro
-const SYSTEM_PROMPT = `Eres Perxia Copilot Pro, un asistente de IA premium con capacidades avanzadas de razonamiento.
+const SYSTEM_PROMPT = `Eres Perxia Copilot Pro, un asistente de IA premium de Periferia IT con capacidades avanzadas de razonamiento.
 
 Tu rol es:
 - Proporcionar análisis profundos y detallados
 - Razonar paso a paso para resolver problemas complejos
-- Ofrecer insights estratégicos y recomendaciones fundamentadas
+- Ofrecer insights estratégicos sobre casos de éxito y proyectos de Periferia IT
 - Abordar consultas técnicas avanzadas con precisión
+
+MUY IMPORTANTE sobre Casos de Éxito y PoCs:
+- Cuando se te proporcione información de CASOS DE ÉXITO o PoCs, son PROYECTOS REALES realizados por Periferia IT
+- Los títulos pueden ser nombres de clientes, empresas o proyectos (NO confundir con información general)
+- Por ejemplo: si el título es "Colombia" o "Bancolombia", se refiere a un CLIENTE o PROYECTO, no al país
+- SIEMPRE basa tu análisis en el contenido del caso de éxito, NO en conocimiento general
+- Analiza qué se hizo, qué tecnologías se usaron, y cuáles fueron los resultados
 
 Directrices:
 - Usa razonamiento estructurado (paso a paso) cuando sea apropiado
@@ -60,12 +67,12 @@ Directrices:
 - Considera múltiples perspectivas antes de concluir
 - Fundamenta tus respuestas con lógica clara
 - Responde siempre en español a menos que se indique lo contrario
-- Cuando uses información de documentos, cita la fuente específica
+- Cuando uses información de casos de éxito, cita el proyecto específico
 
 Cuando sea apropiado, estructura tu respuesta así:
-1. **Análisis del problema**: Identificación de aspectos clave
-2. **Razonamiento**: Evaluación paso a paso
-3. **Conclusión**: Respuesta final con recomendaciones`;
+1. **Análisis del proyecto**: Identificación de aspectos clave
+2. **Razonamiento**: Evaluación de tecnologías y resultados
+3. **Conclusión**: Resumen con insights estratégicos`;
 
 // Build context from RAG search results
 const buildDocumentContext = (searchResults) => {
@@ -118,10 +125,37 @@ const shouldSearchHub = (query) => {
         'qué se ha hecho', 'que se ha hecho', 'qué proyectos', 'que proyectos',
         'qué casos', 'que casos', 'experiencia con', 'trabajado con',
         'implementación', 'implementacion', 'desarrollado',
-        'semillero', 'semilleros'
+        'semillero', 'semilleros',
+        // Keywords para prompts desde tarjetas del Hub
+        'cuéntame sobre', 'cuentame sobre', 'información sobre', 'informacion sobre',
+        'qué se hizo', 'que se hizo', 'qué tecnologías', 'que tecnologias',
+        'resultados', 'dame más información', 'dame mas informacion'
     ];
     
     return hubKeywords.some(keyword => queryLower.includes(keyword));
+};
+
+// Extraer título de proyecto del prompt cuando viene de tarjeta del Hub
+const extractProjectTitle = (query) => {
+    // Patrones para detectar prompts de tarjetas del Hub
+    const patterns = [
+        /cuéntame sobre (?:el|la)?\s*(?:caso de éxito|poc|pov|herramienta|proyecto)?\s*"([^"]+)"/i,
+        /cuentame sobre (?:el|la)?\s*(?:caso de éxito|poc|pov|herramienta|proyecto)?\s*"([^"]+)"/i,
+        /información sobre[:\s]*"?([^"?.]+)"?/i,
+        /informacion sobre[:\s]*"?([^"?.]+)"?/i,
+        /dame más información sobre[:\s]*"?([^"?.]+)"?/i,
+        /dame mas información sobre[:\s]*"?([^"?.]+)"?/i,
+    ];
+    
+    for (const pattern of patterns) {
+        const match = query.match(pattern);
+        if (match && match[1]) {
+            const title = match[1].trim();
+            // Limpiar sufijos comunes
+            return title.replace(/\s+de Periferia IT.*$/i, '').trim();
+        }
+    }
+    return null;
 };
 
 // Buscar en el Hub (Casos de Éxito, PoCs, etc.)
@@ -132,7 +166,23 @@ const searchHubContext = async (query, maxResults = 5) => {
             return { context: '', items: [] };
         }
         
-        const results = await hubSearchService.searchForContext(query, maxResults);
+        // Detectar si es un prompt de tarjeta del Hub y extraer título específico
+        const projectTitle = extractProjectTitle(query);
+        let searchQuery = query;
+        
+        if (projectTitle) {
+            // Buscar primero por título exacto
+            console.log(`[Hub RAG Pro] Detected Hub card prompt, searching for: "${projectTitle}"`);
+            searchQuery = projectTitle;
+        }
+        
+        let results = await hubSearchService.searchForContext(searchQuery, maxResults);
+        
+        // Si no encontró con título exacto, buscar con query original
+        if (projectTitle && (!results.success || results.items.length === 0)) {
+            console.log(`[Hub RAG Pro] No results with exact title, trying original query`);
+            results = await hubSearchService.searchForContext(query, maxResults);
+        }
         
         if (results.success && results.items && results.items.length > 0) {
             console.log(`[Hub RAG Pro] Found ${results.items.length} relevant items from Hub`);
@@ -159,9 +209,11 @@ const buildHubContext = (hubResult) => {
         return '';
     }
 
-    let context = '\n\n🏆 **CONTEXTO DE CASOS DE ÉXITO Y PROYECTOS DE PERIFERIA IT:**\n\n';
+    let context = '\n\n🏆 **INFORMACIÓN DE PROYECTOS REALES DE PERIFERIA IT:**\n';
+    context += '⚠️ IMPORTANTE: Los siguientes son CASOS DE ÉXITO y PROYECTOS REALES. Los títulos son nombres de CLIENTES o PROYECTOS, NO temas generales.\n';
+    context += 'Basa tu análisis ÚNICAMENTE en esta información, NO en conocimiento general.\n\n';
     context += hubResult.context;
-    context += '\n\n---\n\nUsa esta información sobre casos de éxito, PoCs y proyectos de Periferia IT para tu análisis cuando sea relevante.';
+    context += '\n\n---\n\n📌 INSTRUCCIÓN: Analiza qué hizo Periferia IT en estos proyectos, las tecnologías implementadas, los desafíos resueltos y los resultados obtenidos. NO proporciones información general sobre los títulos.';
     
     return context;
 };

@@ -41,6 +41,34 @@ body {
     z-index: 0;
 }
 
+/* Single Periferia Logo Background - Subtle */
+.ambient-glow::after {
+    content: '';
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    width: 280px;
+    height: 280px;
+    background-image: url('/LogoPeriferia.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.04;
+    filter: grayscale(100%) brightness(2);
+    animation: subtle-float 30s ease-in-out infinite;
+}
+
+@keyframes subtle-float {
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 0.04;
+    }
+    50% {
+        transform: translateY(-10px);
+        opacity: 0.06;
+    }
+}
+
 /* Header */
 .header {
     position: relative;

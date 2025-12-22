@@ -31,98 +31,123 @@ class HubSearchService {
      * @returns {string} - Título generado
      */
     extractTitle(item) {
-        // Intentar obtener título de campos existentes
-        if (item.titulo && item.titulo !== 'Sin título' && item.titulo.length > 5) {
-            return this.cleanTitle(item.titulo);
-        }
-        if (item.title && item.title !== 'Untitled' && item.title.length > 5) {
-            return this.cleanTitle(item.title);
-        }
-        if (item.nombre && item.nombre.length > 5) {
-            return this.cleanTitle(item.nombre);
-        }
-        
-        // Extraer del contenido
         const content = item.content || item.contenido || item.chunk || item.text || '';
         
-        // Buscar nombres de empresas/clientes específicos
+        // Lista de países/lugares que NO deben ser títulos por sí solos
+        const invalidTitles = ['colombia', 'ecuador', 'perú', 'peru', 'méxico', 'mexico', 'chile', 
+                              'argentina', 'brasil', 'panamá', 'panama', 'costa rica', 'latinoamérica',
+                              'sin título', 'untitled', 'documento', 'caso de éxito', 'caso de exito'];
+        
+        // Función para validar si un título es útil
+        const isValidTitle = (t) => {
+            if (!t || t.length < 5) return false;
+            const lower = t.toLowerCase().trim();
+            return !invalidTitles.includes(lower) && lower.length > 3;
+        };
+
+        // 1. Buscar nombre de cliente/empresa específico en el contenido
         const clientPatterns = [
-            /(?:cliente|empresa|compañía)[:\s]+([A-ZÁÉÍÓÚÑ][A-Za-záéíóúñ\s&]+?)(?:\.|,|;|\n)/i,
-            /para\s+(?:la empresa\s+)?([A-ZÁÉÍÓÚÑ][A-Za-záéíóúñ\s&]+?)(?:\.|,|;|\s+con|\s+en)/i,
-            /([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)*)\s+(?:revoluciona|moderniza|implementa|transforma)/i,
+            /cliente[:\s]+([A-ZÁÉÍÓÚÑ][A-Za-záéíóúñ\s&\-]+?)(?:\s+Sector|\s+País|\.|,|;|\n)/i,
+            /para\s+(?:el\s+)?(?:Banco\s+)?([A-ZÁÉÍÓÚÑ][A-Za-záéíóúñ0-9\s&\-]+?)(?:\s+Sector|\.|,|;|\n)/i,
+            /(?:Banco|Bancolombia|Davivienda|BBVA|ATH|AVC|Fedepalma|Ruminau|Occidente)(?:\s*\/\s*\w+)?/gi,
         ];
 
+        let clientName = null;
         for (const pattern of clientPatterns) {
             const match = content.match(pattern);
-            if (match && match[1] && match[1].trim().length > 3) {
-                let client = match[1].trim();
-                // Buscar qué se hizo para ese cliente
-                const actionMatch = content.match(/(?:moderniz|transform|implement|revolucion|migr|integr)[aóe]\w*\s+(.{10,50}?)(?:\.|,|;|\n)/i);
-                if (actionMatch) {
-                    return this.cleanTitle(`${client}: ${actionMatch[1].trim()}`);
+            if (match) {
+                const candidate = match[1] || match[0];
+                if (candidate && isValidTitle(candidate)) {
+                    clientName = candidate.trim();
+                    break;
                 }
-                return this.cleanTitle(client);
             }
         }
 
-        // Buscar patrones de logro/resultado específico
-        const achievementPatterns = [
-            /(?:logro|resultado|impacto)[:\s]+([^.;]+?)(?:\.|;|$)/i,
-            /(?:logramos|conseguimos|alcanzamos)\s+(.{15,60}?)(?:\.|;|$)/i,
-            /procesamiento\s+de\s+(.{10,50}?)(?:\.|;|–)/i,
-            /reducción\s+(?:de\s+)?(.{10,40}?)(?:\.|;|$)/i,
-            /(\d+[MKmk]?\s+(?:registros|transacciones|usuarios).{5,30}?)(?:\.|;|$)/i,
-        ];
-
-        for (const pattern of achievementPatterns) {
-            const match = content.match(pattern);
-            if (match && match[1] && match[1].trim().length > 10) {
-                return this.cleanTitle(match[1].trim());
-            }
-        }
-
-        // Buscar nombre del proyecto o sistema
+        // 2. Buscar qué se hizo (el proyecto/acción)
         const projectPatterns = [
-            /sistema\s+(?:de\s+)?([A-Za-záéíóúñ\s]+?)(?:\.|,|;|\n|para)/i,
-            /plataforma\s+(?:de\s+)?([A-Za-záéíóúñ\s]+?)(?:\.|,|;|\n|para)/i,
-            /(?:renovación|modernización|implementación)\s+(?:del?\s+)?([A-Za-záéíóúñ\s]+?)(?:\.|,|;|\n)/i,
-            /bus\s+de\s+servicios[:\s]+([^.;]+)/i,
-            /integración\s+(?:de\s+)?([A-Za-záéíóúñ\s&]+?)(?:\.|,|;|\n)/i,
+            /(?:Implementación|Desarrollo|Migración|Renovación|Integración|Modernización|Creación|Automatización)\s+(?:de(?:l)?\s+)?([^.;]+?)(?:\s+para|\s+en\s+|\.|;)/i,
+            /(?:Maquila|Certificación|Aplicaciones?|Sistema|Plataforma|Bus de Servicios?)\s+(?:de\s+|en\s+)?([^.;]{5,50}?)(?:\s+para|\.|;)/i,
+            /proyecto\s+([^.;]+?)(?:\s+para|\.|;)/i,
+            /(?:CI\/CD|DevOps|DevSecOps|QR|SAM|FEP)\s+(?:para\s+)?([^.;]+?)(?:\.|;|$)/i,
         ];
 
+        let projectDesc = null;
         for (const pattern of projectPatterns) {
             const match = content.match(pattern);
             if (match && match[1] && match[1].trim().length > 5) {
-                return this.cleanTitle(match[1].trim());
+                projectDesc = match[1].trim();
+                // Limpiar si termina en palabras comunes
+                projectDesc = projectDesc.replace(/\s+(de|del|para|en|con|al|la|el|los|las)$/i, '');
+                break;
             }
         }
 
-        // Buscar tecnologías principales mencionadas
-        const techMatch = content.match(/(?:Azure|AWS|Kubernetes|Docker|Power BI|Cosmos DB|SQL Server|SAP|Dynamics)(?:\s+\w+){0,3}/gi);
-        if (techMatch && techMatch.length > 0) {
-            const mainTech = techMatch[0];
-            // Buscar qué se hizo con esa tecnología
-            const useMatch = content.match(new RegExp(`${mainTech}[^.]{5,40}`, 'i'));
-            if (useMatch) {
-                return this.cleanTitle(useMatch[0]);
+        // También buscar la acción directamente
+        const actionMatch = content.match(/(?:Implementación|Desarrollo|Migración|Renovación|Integración|Modernización|Creación)\s+(?:de(?:l)?\s+)?([A-Za-záéíóúñ\s\/\-]+?)(?:\s+para|\.|;)/i);
+        if (actionMatch && actionMatch[0]) {
+            const fullAction = actionMatch[0].replace(/\s+para.*$/, '').trim();
+            if (fullAction.length > 10 && fullAction.length < 60) {
+                projectDesc = fullAction;
             }
-            return this.cleanTitle(`Proyecto ${mainTech}`);
         }
 
-        // Último recurso: buscar primera oración significativa (no labels)
-        const sentences = content
-            .replace(/^[A-Z\s]+[;:]/gm, '') // Quitar labels como "CASO DE ÉXITO;"
-            .split(/[.!?]+/)
-            .filter(s => s.trim().length > 15 && !s.match(/^(logro|titulo|blog|fecha)/i));
+        // 3. Construir título combinando cliente + proyecto
+        let title = '';
         
-        if (sentences.length > 0) {
-            let sentence = sentences[0].trim();
-            // Tomar las primeras 6-8 palabras
-            const words = sentence.split(/\s+/).slice(0, 7);
-            return this.cleanTitle(words.join(' '));
+        if (projectDesc && clientName) {
+            // Tenemos ambos: "Proyecto X para Cliente Y"
+            title = `${projectDesc} - ${clientName}`;
+        } else if (projectDesc) {
+            // Solo proyecto
+            title = projectDesc;
+        } else if (clientName && isValidTitle(clientName)) {
+            // Solo cliente válido
+            title = `Proyecto para ${clientName}`;
         }
 
-        return 'Documento sin título';
+        // 4. Si aún no tenemos título, buscar en campos del documento
+        if (!title || !isValidTitle(title)) {
+            // Buscar en descripción
+            const desc = item.descripcion || item.description || '';
+            if (desc && desc.length > 10 && isValidTitle(desc.split('.')[0])) {
+                title = desc.split('.')[0].trim();
+            }
+        }
+
+        // 5. Buscar tecnologías clave como último recurso
+        if (!title || !isValidTitle(title)) {
+            const techPatterns = [
+                /(Azure\s+\w+(?:\s+\w+)?)/i,
+                /(AWS\s+\w+(?:\s+\w+)?)/i,
+                /(Power\s+(?:BI|Apps|Automate))/i,
+                /(Kubernetes|Docker|DevOps|CI\/CD)/i,
+                /(Cosmos\s+DB|SQL\s+Server|MongoDB)/i,
+            ];
+            
+            for (const pattern of techPatterns) {
+                const match = content.match(pattern);
+                if (match && match[1]) {
+                    title = `Implementación ${match[1]}`;
+                    break;
+                }
+            }
+        }
+
+        // 6. Último recurso: primera oración significativa
+        if (!title || !isValidTitle(title)) {
+            const sentences = content
+                .replace(/^[A-Z\s]+[;:]/gm, '')
+                .split(/[.!?]+/)
+                .filter(s => s.trim().length > 20 && isValidTitle(s));
+            
+            if (sentences.length > 0) {
+                const words = sentences[0].trim().split(/\s+/).slice(0, 8);
+                title = words.join(' ');
+            }
+        }
+
+        return this.cleanTitle(title || 'Proyecto de Periferia IT');
     }
 
     /**
@@ -137,7 +162,9 @@ class HubSearchService {
         title = title
             .replace(/^[\/\-\s:;]+/, '')
             .replace(/^(logro|titulo|blog|fecha|cliente|proyecto)[:\s]*/i, '')
+            .replace(/^(Colombia|Ecuador|Perú|México|Chile|Argentina)[:\s]*/i, '') // Quitar países al inicio
             .replace(/[""\[\]]+/g, '')
+            .replace(/\s+/g, ' ')
             .trim();
         
         // Capitalizar primera letra
@@ -146,8 +173,8 @@ class HubSearchService {
         }
         
         // Limitar longitud
-        if (title.length > 55) {
-            title = title.substring(0, 52) + '...';
+        if (title.length > 60) {
+            title = title.substring(0, 57) + '...';
         }
         
         return title || 'Sin título';
@@ -333,15 +360,36 @@ class HubSearchService {
      * @returns {object} - Documento enriquecido
      */
     enrichItem(item) {
-        return {
+        // Mapear campos del índice (con mayúsculas) a campos esperados
+        const content = item.Contenido || item.contenido || item.content || item.chunk || item.text || '';
+        const titulo = item.TituloCaso || item.Nombre || item.titulo || item.title || '';
+        const cliente = item.Cliente || item.cliente || '';
+        const enlace = item.Enlace || item.enlace || item.url || '';
+        const keyPhrases = item.keyPhrases || [];
+        const organizations = item.organizations || [];
+        
+        // Crear item normalizado
+        const normalized = {
             ...item,
+            // Campos normalizados (lowercase)
+            content: content,
+            title: titulo,
+            cliente: cliente,
+            enlace: enlace,
+            keyPhrases: keyPhrases,
+            organizations: organizations,
+        };
+        
+        return {
+            ...normalized,
             // Campos enriquecidos
-            enrichedTitle: this.extractTitle(item),
-            enrichedType: this.classifyType(item),
-            enrichedTags: this.extractTags(item),
-            enrichedDescription: this.extractDescription(item),
+            enrichedTitle: titulo || this.extractTitle(normalized),
+            enrichedType: this.classifyType(normalized),
+            enrichedTags: keyPhrases.length > 0 ? keyPhrases.slice(0, 5) : this.extractTags(normalized),
+            enrichedDescription: content ? (content.length > 200 ? content.substring(0, 197) + '...' : content) : 'Sin descripción disponible',
+            enrichedCliente: cliente || (organizations.length > 0 ? organizations[0] : 'Periferia IT'),
             // Mantener campos originales
-            originalTitle: item.titulo || item.title || null,
+            originalTitle: titulo,
             originalType: item.tipo || item.type || item.categoria || null
         };
     }
@@ -454,7 +502,34 @@ class HubSearchService {
         }
 
         try {
-            const results = await this.search(query, { top, enrich: true });
+            // Primero intentar búsqueda normal
+            let results = await this.search(query, { top, enrich: true });
+            
+            // Si no hay resultados, intentar con términos clave del query
+            if (results.items.length === 0) {
+                // Extraer palabras clave importantes (nombres de empresas, tecnologías, etc.)
+                const keywords = query
+                    .replace(/["""'']/g, '') // Quitar comillas
+                    .replace(/cuéntame sobre|cuentame sobre|información sobre|informacion sobre/gi, '')
+                    .replace(/de Periferia IT.*$/i, '')
+                    .replace(/el caso de éxito|la poc|el pov|la herramienta|el proyecto/gi, '')
+                    .trim();
+                
+                if (keywords && keywords.length > 3) {
+                    console.log(`[Hub Search] Retry with keywords: "${keywords}"`);
+                    results = await this.search(keywords, { top, enrich: true });
+                }
+            }
+            
+            // Si aún no hay resultados, intentar búsqueda más amplia
+            if (results.items.length === 0) {
+                // Extraer posibles nombres de empresa/proyecto
+                const entityMatch = query.match(/(?:FEDEPALMA|ATH|Banco|Occidente|Ruminau|FEP|Certificación|Migración|DevOps)/i);
+                if (entityMatch) {
+                    console.log(`[Hub Search] Retry with entity: "${entityMatch[0]}"`);
+                    results = await this.search(entityMatch[0], { top, enrich: true });
+                }
+            }
             
             // Construir contexto para el LLM usando campos enriquecidos
             let context = '';
@@ -462,12 +537,27 @@ class HubSearchService {
                 context = results.items.map((item, i) => {
                     const title = item.enrichedTitle || 'Sin título';
                     const type = item.enrichedType || 'documento';
+                    const typeLabel = type === 'caso_exito' ? 'CASO DE ÉXITO' : 
+                                      type === 'poc' ? 'PRUEBA DE CONCEPTO (PoC)' :
+                                      type === 'pov' ? 'PRUEBA DE VALOR (PoV)' :
+                                      type === 'herramienta' ? 'HERRAMIENTA' : 'DOCUMENTO';
                     const tags = item.enrichedTags?.join(', ') || '';
                     const desc = item.enrichedDescription || '';
                     const content = item.content || item.contenido || item.chunk || '';
                     
-                    return `[${i + 1}] ${title} (${type}${tags ? `, Tags: ${tags}` : ''})\n${desc}\n\nContenido completo:\n${content}`;
-                }).join('\n\n---\n\n');
+                    // Formato más claro para que la IA no confunda con información general
+                    return `══════════════════════════════════════
+📋 ${typeLabel} #${i + 1}
+══════════════════════════════════════
+🏷️ NOMBRE DEL PROYECTO/CLIENTE: ${title}
+📂 Tipo: ${typeLabel}
+${tags ? `🔖 Tecnologías/Tags: ${tags}` : ''}
+${desc ? `📝 Resumen: ${desc}` : ''}
+
+📄 DETALLE DEL PROYECTO:
+${content}
+══════════════════════════════════════`;
+                }).join('\n\n');
             }
 
             return {

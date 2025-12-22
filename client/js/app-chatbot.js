@@ -721,6 +721,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const tagsArray = Array.isArray(tags) ? tags : [];
                 const tagsHtml = tagsArray.slice(0, 4).map(t => `<span class="tag">${t}</span>`).join('');
                 
+                // Construir prompt específico según el tipo
+                const typeLabelForPrompt = itemType === 'caso_exito' ? 'caso de éxito' :
+                                           itemType === 'poc' ? 'PoC (Prueba de Concepto)' :
+                                           itemType === 'pov' ? 'PoV (Prueba de Valor)' :
+                                           itemType === 'herramienta' ? 'herramienta' : 'proyecto';
+                
+                // Prompt mejorado con contexto de Periferia IT
+                const specificPrompt = `Cuéntame sobre el ${typeLabelForPrompt} "${title}" de Periferia IT. ¿Qué se hizo, qué tecnologías se usaron y cuáles fueron los resultados?`;
+                
                 return `
                     <div class="hub-card" data-id="${item.id || ''}" data-type="${itemType}" data-tags="${tagsArray.join(',')}">
                         <div class="hub-card-header">
@@ -732,7 +741,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <p>${shortDesc}</p>
                             ${tagsHtml ? `<div class="hub-card-tags">${tagsHtml}</div>` : ''}
                         </div>
-                        <button class="hub-card-action" data-prompt="Dame más información sobre: ${title}">
+                        <button class="hub-card-action" data-prompt="${specificPrompt.replace(/"/g, '&quot;')}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                             </svg>
