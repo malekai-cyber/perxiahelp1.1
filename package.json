@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --max-old-space-size=2048 server.js",
     "dev": "cross-env NODE_OPTIONS=--max-old-space-size=2048 nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests configured\" && exit 0"
   },
   "keywords": [
     "azure",
